@@ -1,0 +1,11 @@
+version: 1
+lang: go
+name: dply-server
+contract: 
+  output-grst: handler/grst/
+  proto-files:
+    - contract/user.proto
+    - contract/image.proto
+    - contract/spec.proto
+    - contract/deploy.proto
+    - contract/server.proto

@@ -1,0 +1,49 @@
+syntax = "proto3";
+package user;
+option go_package = ".;user";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "cdd/api/cddext.proto";
+
+service UserApi {
+    rpc Login(LoginReq) returns (User) {
+        option (google.api.http) = {
+            post: "/user/login"
+            body: "*"
+        };
+    }
+
+    rpc GetCurrentLogin(google.protobuf.Empty) returns (User) {
+        option (google.api.http) = {
+            get: "/user/login"
+        };
+    }
+
+    rpc UpdatePassword(UpdatePasswordReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/user/edit/password"
+            body: "*"
+        };
+    }
+}
+
+message LoginReq {
+    string Email = 1 [json_name="email", (cdd.api.validate) = "required|email"];
+    string Password = 2 [json_name="password", (cdd.api.validate) = "required"];
+}
+
+
+message UpdatePasswordReq {
+    string Email = 1 [json_name="email", (cdd.api.validate) = "required|email"];
+    string OldPassword = 2 [json_name="old_password", (cdd.api.validate) = "required|min=6"];
+    string NewPassword = 3 [json_name="new_password", (cdd.api.validate) = "required|min=6"];
+}
+
+message User {
+    string Name = 1 [json_name="name"];
+    string Usertype = 2 [json_name="usertype"];
+    string Email = 3 [json_name="email"];
+    string Token = 4 [json_name="token"];
+}

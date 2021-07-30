@@ -1,0 +1,11 @@
+version: 1
+lang: go
+name: dply
+# contract: 
+#   output-grst: handler/grst/
+#   proto-files:
+#     - contract/goalsetting.proto
+dependencies:
+  output-grst: clients/grst/
+  services:
+    - ../dply-server/service.yaml

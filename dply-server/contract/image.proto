@@ -1,0 +1,61 @@
+syntax = "proto3";
+package image;
+option go_package = ".;image";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "cdd/api/cddext.proto";
+
+service ImageApi {
+    rpc Get(GetReq) returns (Images) {
+        option (google.api.http) = {
+            get: "/image"
+        };
+    }
+
+    rpc Add(AddReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/image/add"
+            body: "*"
+        };
+    }
+
+    //rpc Remove(RemoveReq) returns (google.protobuf.Empty) {
+    //    option (google.api.http) = {
+    //        post: "/image/remove"
+    //        body: "*"
+    //    };
+    //}
+}
+
+message Image {
+    int32 Id = 1 [json_name="id"];
+    string Digest = 2 [json_name="digest"];
+    string Image = 4 [json_name="image"];
+    string Repository = 5 [json_name="repository"];
+    string Description = 6 [json_name="description"];
+    int32 CreatedBy = 7 [json_name="created_by"];
+    google.protobuf.Timestamp CreatedAt = 8 [json_name="created_at"];
+}
+
+message Images {
+    repeated Image Images = 1 [json_name="images"];
+}
+
+message GetReq {
+    string Repository = 1 [json_name="repository", (cdd.api.validate) = "required"];
+    int32 Size = 2 [json_name="size"];
+    int32 Page = 3 [json_name="page"];
+}
+
+message AddReq {
+    string Image = 1 [json_name="image", (cdd.api.validate) = "required"];
+    string Repository = 2 [json_name="repository", (cdd.api.validate) = "required"];
+    string Description = 3 [json_name="description"];
+}
+
+message RemoveReq {
+    string Repository = 1 [json_name="repository", (cdd.api.validate) = "required"];
+    string Digest = 2 [json_name="digest", (cdd.api.validate) = "required"];
+}

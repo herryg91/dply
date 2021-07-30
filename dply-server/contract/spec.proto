@@ -1,0 +1,210 @@
+syntax = "proto3";
+package spec;
+option go_package = ".;spec";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "cdd/api/cddext.proto";
+
+service SpecApi {
+    rpc GetEnvar(GetEnvarReq) returns (Envar) {
+        option (google.api.http) = {
+            get: "/spec/envar"
+        };
+    }
+
+    rpc UpsertEnvar(UpsertEnvarReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/spec/envar/upsert"
+            body: "*"
+        };
+    }
+
+    rpc GetScale(GetScaleReq) returns (Scale) {
+        option (google.api.http) = {
+            get: "/spec/scale"
+        };
+    }
+
+    rpc UpsertScale(UpsertScaleReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/spec/scale/upsert"
+            body: "*"
+        };
+    }
+
+    rpc GetPort(GetPortReq) returns (Ports) {
+        option (google.api.http) = {
+            get: "/spec/port"
+        };
+    }
+
+    rpc UpsertPort(UpsertPortReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/spec/port/upsert"
+            body: "*"
+        };
+    }
+
+    //rpc GetPortTemplate(GetPortTemplateReq) returns (Ports) {
+    //    option (google.api.http) = {
+    //        get: "/spec/port/template"
+    //    };
+    //}
+
+    //rpc UpdatePortTemplate(UpdatePortTemplateReq) returns (google.protobuf.Empty) {
+    //    option (google.api.http) = {
+    //        post: "/spec/port/template"
+    //        body: "*"
+    //    };
+    //}
+
+    rpc GetAffinity(GetAffinityReq) returns (Affinity) {
+        option (google.api.http) = {
+            get: "/spec/affinity"
+        };
+    }
+
+    rpc UpsertAffinity(UpsertAffinityReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/spec/affinity/upsert"
+            body: "*"
+        };
+    }
+
+    //rpc GetAffinityTemplate(GetAffinityTemplateReq) returns (Affinity) {
+    //    option (google.api.http) = {
+    //        get: "/spec/affinity/template"
+    //    };
+    //}
+
+    //rpc UpdateAffinityTemplate(UpdateAffinityTemplateReq) returns (google.protobuf.Empty) {
+    //    option (google.api.http) = {
+    //        post: "/spec/affinity/template"
+    //        body: "*"
+    //    };
+    //}
+}
+
+// Variable
+
+message GetEnvarReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+}
+
+message UpsertEnvarReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+    string Variables = 3 [json_name="variables", (cdd.api.validate) = "required|json"];
+}
+
+message Envar {
+    string Variables = 1 [json_name="variables"];
+}
+
+// Scale
+
+message GetScaleReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+}
+
+message UpsertScaleReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+    int32 MinReplica = 3 [json_name="min_replica", (cdd.api.validate) = "required|min=1"];
+    int32 MaxReplica = 4 [json_name="max_replica", (cdd.api.validate) = "required|min=1"];
+    int32 MinCpu = 5 [json_name="min_cpu", (cdd.api.validate) = "required|min=10"];
+    int32 MaxCpu = 6 [json_name="max_cpu", (cdd.api.validate) = "required|min=10"];
+    int32 MinMemory = 7 [json_name="min_memory", (cdd.api.validate) = "required|min=10"];
+    int32 MaxMemory = 8 [json_name="max_memory", (cdd.api.validate) = "required|min=10"];
+    int32 TargetCPUUtilization = 9 [json_name="target_cpu", (cdd.api.validate) = "required|min=1|max=100"];
+}
+
+message Scale {
+    string Env = 2 [json_name="env"];
+    string Name = 3 [json_name="name"];
+    int32 MinReplica = 4 [json_name="min_replica"];
+    int32 MaxReplica = 5 [json_name="max_replica"];
+    int32 MinCpu = 6 [json_name="min_cpu"];
+    int32 MaxCpu = 7 [json_name="max_cpu"];
+    int32 MinMemory = 8 [json_name="min_memory"];
+    int32 MaxMemory = 9 [json_name="max_memory"];
+    int32 TargetCPUUtilization = 10 [json_name="target_cpu"];
+}
+
+// Port
+
+message GetPortReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+}
+
+message UpsertPortReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+    repeated Port Ports = 3 [json_name="ports"];
+}
+
+message Ports {
+    repeated Port Ports = 1 [json_name="ports"];
+}
+
+message Port {
+    string PortName = 1 [json_name="name", (cdd.api.validate) = "required"];
+    int32 Port = 2 [json_name="port", (cdd.api.validate) = "required"];
+    string Protocol = 3 [json_name="protocol", (cdd.api.validate) = "required|enum=TCP,UDP,SCTP"];
+}
+
+message GetPortTemplateReq {
+    string TemplateName = 1 [json_name="template_name", (cdd.api.validate) = "required"];
+}
+
+message UpdatePortTemplateReq {
+    string TemplateName = 1 [json_name="template_name", (cdd.api.validate) = "required"];
+    repeated Port Ports = 2 [json_name="ports"];
+}
+
+// Affinity
+
+message GetAffinityReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+}
+
+message UpsertAffinityReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+    repeated AffinityTerm NodeAffinity = 3 [json_name="node_affinity"];
+	repeated AffinityTerm PodAffinity = 4 [json_name="pod_affinity"];
+	repeated AffinityTerm PodAntiAffinity = 5 [json_name="pod_anti_affinity"];
+}
+
+message Affinity {
+    repeated AffinityTerm NodeAffinity = 3 [json_name="node_affinity", (cdd.api.validate) = "required"];
+	repeated AffinityTerm PodAffinity = 4 [json_name="pod_affinity", (cdd.api.validate) = "required"];
+	repeated AffinityTerm PodAntiAffinity = 5 [json_name="pod_anti_affinity", (cdd.api.validate) = "required"];
+}
+
+message AffinityTerm {
+    string Mode = 1 [json_name="mode", (cdd.api.validate) = "required|enum=required,preferred"];
+    string Key = 2 [json_name="key", (cdd.api.validate) = "required"];
+    string Operator = 3 [json_name="operator", (cdd.api.validate) = "required|enum=In,NotIn,Exists,DoesNotExist,Gt,Lt"];
+    repeated string Values = 4 [json_name="values"];
+    int32 Weight = 5 [json_name="weight", (cdd.api.validate) = "min=0|max=100"];
+    string TopologyKey = 6 [json_name="topology_key"];
+}
+
+
+message GetAffinityTemplateReq {
+    string TemplateName = 1 [json_name="template_name", (cdd.api.validate) = "required"];
+}
+
+message UpdateAffinityTemplateReq {
+    string TemplateName = 1 [json_name="template_name", (cdd.api.validate) = "required"];
+    repeated AffinityTerm NodeAffinity = 2 [json_name="node_affinity"];
+	repeated AffinityTerm PodAffinity = 3 [json_name="pod_affinity"];
+	repeated AffinityTerm PodAntiAffinity = 4 [json_name="pod_anti_affinity"];
+}

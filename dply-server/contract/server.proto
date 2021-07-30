@@ -1,0 +1,20 @@
+syntax = "proto3";
+package server;
+option go_package = ".;server";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "cdd/api/cddext.proto";
+
+service ServerApi {
+    rpc Status(google.protobuf.Empty) returns (StatusResp) {
+        option (google.api.http) = {
+            get: "/server/status"
+        };
+    }
+}
+
+message StatusResp {
+    string Status = 1 [json_name="status"];
+}

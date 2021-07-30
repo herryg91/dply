@@ -1,0 +1,35 @@
+syntax = "proto3";
+package deploy;
+option go_package = ".;deploy";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "cdd/api/cddext.proto";
+
+service DeployApi {
+    rpc DeployImage(DeployImageReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/deploy/image"
+            body: "*"
+        };
+    }
+
+    rpc Redeploy(RedeployReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/deploy/reload"
+            body: "*"
+        };
+    }
+}
+
+message DeployImageReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+    string Digest = 3 [json_name="digest", (cdd.api.validate) = "required"];
+}
+
+message RedeployReq {
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+}
