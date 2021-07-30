@@ -49,6 +49,7 @@ func New() *CmdSpec {
 		Long:  "Manage deployment spec: envar, port, etc.",
 	}
 
+	c.AddCommand(newSpecGet(envar_uc, port_uc, scale_uc, affinity_uc).Command)
 	c.AddCommand(newSpecScalingGet(scale_uc).Command)
 	c.AddCommand(newSpecScalingEdit(scale_uc, setting).Command)
 	c.AddCommand(newSpecEnvarGet(envar_uc).Command)
