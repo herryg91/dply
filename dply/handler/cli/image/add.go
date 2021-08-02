@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	image_usecase "github.com/herryg91/dply/dply/app/usecase/image"
+	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 
 	"github.com/spf13/cobra"
 )
@@ -37,7 +38,11 @@ func (c *CmdImageAdd) runCommand(cmd *cobra.Command, args []string) error {
 	if c.image_uc == nil {
 		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
 	} else if c.name == "" {
-		return errors.New("parameter --name or -n is required")
+		data, err := serviceYaml.GetServiceYAML("service.yaml")
+		if err != nil || data.Name == "" {
+			return errors.New("parameter --name or -n is required")
+		}
+		c.name = data.Name
 	} else if c.image == "" {
 		return errors.New("parameter --image or -i is required")
 	} else if c.image != "" {

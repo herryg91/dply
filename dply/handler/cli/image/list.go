@@ -7,6 +7,7 @@ import (
 	"time"
 
 	image_usecase "github.com/herryg91/dply/dply/app/usecase/image"
+	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 	"github.com/olekukonko/tablewriter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -39,7 +40,11 @@ func (c *CmdImageList) runCommand(cmd *cobra.Command, args []string) error {
 	if c.image_uc == nil {
 		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
 	} else if c.name == "" {
-		return errors.New("parameter --name or -n is required")
+		data, err := serviceYaml.GetServiceYAML("service.yaml")
+		if err != nil || data.Name == "" {
+			return errors.New("parameter --name or -n is required")
+		}
+		c.name = data.Name
 	}
 
 	datas, err := c.image_uc.GetList(c.name, c.page, c.size)
