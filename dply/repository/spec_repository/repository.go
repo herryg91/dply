@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	grst_errors "github.com/herryg91/cdd/grst/errors"
 	repository_intf "github.com/herryg91/dply/dply/app/repository"
@@ -54,7 +55,12 @@ func (r *repository) UpsertEnvar(data entity.Envar) error {
 
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
-	variables, _ := json.Marshal(&data.Variables)
+	toUpperVariable := map[string]interface{}{}
+	for k, v := range data.Variables {
+		toUpperVariable[strings.ToUpper(k)] = v
+	}
+
+	variables, _ := json.Marshal(&toUpperVariable)
 	_, err := r.cli.UpsertEnvar(ctx, &pbSpec.UpsertEnvarReq{
 		Env:       data.Env,
 		Name:      data.Name,
