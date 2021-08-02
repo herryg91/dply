@@ -115,7 +115,7 @@ func main() {
 
 	deploy_repo := deployment_repository.New(db)
 	k8s_repo := k8s_repository.New(k8sClient)
-	deploy_uc := deploy_usecase.New(deploy_repo, k8s_repo, image_repo, envar_repo, scale_repo, port_repo, affinity_repo)
+	deploy_uc := deploy_usecase.New(deploy_repo, k8s_repo, image_uc, envar_uc, scale_uc, port_uc, affinity_uc)
 	deploy_hndl := handler.NewDeployHandler(deploy_uc)
 
 	migration_repo := migration_repository.New(db)

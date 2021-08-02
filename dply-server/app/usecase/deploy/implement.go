@@ -5,61 +5,66 @@ import (
 	"fmt"
 
 	"github.com/herryg91/dply/dply-server/app/repository"
+	affinity_usecase "github.com/herryg91/dply/dply-server/app/usecase/affinity"
+	envar_usecase "github.com/herryg91/dply/dply-server/app/usecase/envar"
+	image_usecase "github.com/herryg91/dply/dply-server/app/usecase/image"
+	port_usecase "github.com/herryg91/dply/dply-server/app/usecase/port"
+	scale_usecase "github.com/herryg91/dply/dply-server/app/usecase/scale"
 	"github.com/herryg91/dply/dply-server/entity"
 )
 
 type usecase struct {
-	deploy_repo   repository.DeploymentRepository
-	k8s_repo      repository.K8sRepository
-	image_repo    repository.ImageRepository
-	envar_repo    repository.EnvarRepository
-	scale_repo    repository.ScaleRepository
-	port_repo     repository.PortRepository
-	affinity_repo repository.AffinityRepository
+	deploy_repo repository.DeploymentRepository
+	k8s_repo    repository.K8sRepository
+	image_uc    image_usecase.UseCase
+	envar_uc    envar_usecase.UseCase
+	scale_uc    scale_usecase.UseCase
+	port_uc     port_usecase.UseCase
+	affinity_uc affinity_usecase.UseCase
 }
 
 func New(
 	deploy_repo repository.DeploymentRepository,
 	k8s_repo repository.K8sRepository,
-	image_repo repository.ImageRepository,
-	envar_repo repository.EnvarRepository,
-	scale_repo repository.ScaleRepository,
-	port_repo repository.PortRepository,
-	affinity_repo repository.AffinityRepository,
+	image_uc image_usecase.UseCase,
+	envar_uc envar_usecase.UseCase,
+	scale_uc scale_usecase.UseCase,
+	port_uc port_usecase.UseCase,
+	affinity_uc affinity_usecase.UseCase,
 ) UseCase {
 	return &usecase{
-		deploy_repo:   deploy_repo,
-		k8s_repo:      k8s_repo,
-		image_repo:    image_repo,
-		envar_repo:    envar_repo,
-		scale_repo:    scale_repo,
-		port_repo:     port_repo,
-		affinity_repo: affinity_repo,
+		deploy_repo: deploy_repo,
+		k8s_repo:    k8s_repo,
+		image_uc:    image_uc,
+		envar_uc:    envar_uc,
+		scale_uc:    scale_uc,
+		port_uc:     port_uc,
+		affinity_uc: affinity_uc,
 	}
 }
 
 func (uc *usecase) DeployImage(env string, name string, digest string, createdBy int) error {
-	currentImage, err := uc.image_repo.GetByDigest(digest)
+	currentImage, err := uc.image_uc.GetByDigest(digest)
 	if err != nil {
 		return fmt.Errorf("%w: %v", ErrUnexpected, err.Error())
 	}
 
-	currentEnvar, _ := uc.envar_repo.Get(env, name)
+	currentEnvar, _ := uc.envar_uc.Get(env, name)
 	if currentEnvar == nil {
 		currentEnvar = entity.Envar{}.DefaultEnvar(env, name)
 	}
 
-	currentScale, _ := uc.scale_repo.Get(env, name)
+	currentScale, _ := uc.scale_uc.Get(env, name)
 	if currentScale == nil {
 		currentScale = entity.Scale{}.DefaultScale(env, name)
 	}
 
-	currentPort, _ := uc.port_repo.Get(env, name)
+	currentPort, _ := uc.port_uc.Get(env, name)
 	if currentPort == nil {
 		currentPort = entity.Port{}.DefaultPort(env, name)
 	}
 
-	currentAffinity, _ := uc.affinity_repo.Get(env, name)
+	currentAffinity, _ := uc.affinity_uc.Get(env, name)
 	if currentAffinity == nil {
 		currentAffinity = entity.Affinity{}.DefaultAffinity(env, name)
 	}

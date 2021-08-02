@@ -13,4 +13,5 @@ type UseCase interface {
 	Get(repository string, page, size int) ([]entity.Image, error)
 	Add(repository, fullImage, description string, createdBy int) error
 	Remove(digest string) error
+	GetByDigest(digest string) (*entity.Image, error)
 }

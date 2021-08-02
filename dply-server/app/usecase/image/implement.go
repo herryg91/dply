@@ -83,3 +83,11 @@ func (uc *usecase) Remove(digest string) error {
 	}
 	return nil
 }
+
+func (uc *usecase) GetByDigest(digest string) (*entity.Image, error) {
+	resp, err := uc.repo.GetByDigest(digest)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrUnexpected, err)
+	}
+	return resp, nil
+}
