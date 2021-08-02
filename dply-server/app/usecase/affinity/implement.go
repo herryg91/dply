@@ -1,6 +1,7 @@
 package affinity_usecase
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -32,8 +33,13 @@ func (uc *usecase) Get(env string, name string) (*entity.Affinity, error) {
 		if err != nil {
 			return nil, err
 		}
-
-		return defaultTmpl.ToAffinityEntity(env, name), nil
+		resp = defaultTmpl.ToAffinityEntity(env, name)
+		tmpResp, _ := json.Marshal(&resp)
+		tmpRespStr := string(tmpResp)
+		tmpRespStr = strings.Replace(tmpRespStr, "%"+"name"+"%", name, -1)
+		tmpRespStr = strings.Replace(tmpRespStr, "%"+"env"+"%", env, -1)
+		json.Unmarshal([]byte(tmpRespStr), &resp)
+		return resp, nil
 	}
 	return resp, nil
 }
@@ -58,6 +64,7 @@ func (uc *usecase) GetTemplate(templateName string) (*entity.AffinityTemplate, e
 		}
 		return nil, fmt.Errorf("%w: %v", ErrUnexpected, err.Error())
 	}
+
 	return resp, nil
 }
 

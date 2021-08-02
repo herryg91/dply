@@ -31,57 +31,48 @@ subjects:
   namespace: dply
 ---
 apiVersion: v1
-kind: PersistentVolume
+kind: Service
 metadata:
-  name: dply-mysql-pv
+  name: dply-mysql-pods
   namespace: dply
   labels:
-    type: local
+    app: dply-mysql
 spec:
-  storageClassName: standard
-  capacity:
-    storage: 2Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: "/var/lib/data"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: dply-mysql-pvc
-  namespace: dply
-spec:
-  storageClassName: standard
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
+  ports:
+  - name: mysql
+    port: 3306
+  clusterIP: None
+  selector:
+    app: dply-mysql
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: dply-mysql
   namespace: dply
+  labels:
+    app: dply-mysql
 spec:
   ports:
-  - port: 3306
+  - name: mysql
+    port: 3306
   selector:
     app: dply-mysql
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: dply-mysql
   namespace: dply
+  labels:
+    app: dply-mysql
 spec:
   selector:
     matchLabels:
       app: dply-mysql
-  strategy:
-    type: Recreate
+  serviceName: "dply-mysql"
+  podManagementPolicy: Parallel
+  replicas: 1
   template:
     metadata:
       labels:
@@ -99,12 +90,28 @@ spec:
         - containerPort: 3306
           name: mysql
         volumeMounts:
-        - name: mysql-persistent-storage
+        - name: dply-mysql-pv-volume
           mountPath: /var/lib/mysql
-      volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: dply-mysql-pvc
+        livenessProbe:
+          exec:
+            command: ["mysqladmin", "ping"]
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["mysql", "-h", "localhost", "-pmysql@dply", "-e", "SELECT 1"]
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          timeoutSeconds: 1
+  volumeClaimTemplates:
+  - metadata:
+      name: dply-mysql-pv-volume
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -134,6 +141,10 @@ spec:
         app: dply-server
         stack: go
     spec:
+      initContainers:
+      - name: init-mydb
+        image: mysql:8
+        command: ['sh', '-c', "until mysql -h dply-mysql.dply.svc.cluster.local -pmysql@dply -e \"SELECT 1\"; do echo waiting for mydb; sleep 2; done"]
       containers:
       - name: dply-server
         image: herryg91/dply-server@sha256:d0b1314101ecc9aacdbe78efd4935a6b723bfde47fab6f88d3ea269e2d2146d3
