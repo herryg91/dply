@@ -34,7 +34,12 @@ func (r *repository) Get(env, name string) (*entity.Deployment, error) {
 
 func (r *repository) Create(in entity.Deployment) error {
 	variables, _ := json.Marshal(in.Envar.Variables)
-	ports, _ := json.Marshal(in.Port.Ports)
+	portsJson := map[string]interface{}{
+		"ports":       in.Port.Ports,
+		"access_type": in.Port.AccessType,
+		"external_ip": in.Port.ExternalIP,
+	}
+	portsJsonMarshalled, _ := json.Marshal(&portsJson)
 
 	timeNow := time.Now().UTC()
 	deploymentModel := &DeploymentModel{
@@ -42,7 +47,7 @@ func (r *repository) Create(in entity.Deployment) error {
 		Name:        in.Name,
 		ImageDigest: in.DeploymentImage.Digest,
 		Variables:   variables,
-		Ports:       ports,
+		Ports:       portsJsonMarshalled,
 		CreatedBy:   in.CreatedBy,
 		CreatedAt:   &timeNow,
 		UpdatedAt:   &timeNow,

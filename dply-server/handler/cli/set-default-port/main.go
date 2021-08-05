@@ -44,7 +44,7 @@ func main() {
 		logrus.Errorln(err.Error())
 		return
 	}
-	currentTemplateIndented, _ := json.MarshalIndent(currentTemplate.Ports, "", "    ")
+	currentTemplateIndented, _ := json.MarshalIndent(currentTemplate, "", "    ")
 
 	// Get Updated Data via Editor
 	updatedData, err := editor.Open(editorApp, "tmp_port_edit", currentTemplateIndented)
@@ -60,9 +60,8 @@ func main() {
 
 	data := entity.PortTemplate{
 		TemplateName: "default",
-		Ports:        []entity.PortSpec{},
 	}
-	err = json.Unmarshal(updatedData, &data.Ports)
+	err = json.Unmarshal(updatedData, &data)
 	if err != nil {
 		logrus.Errorln(fmt.Errorf("Unexpected error: %v", "Error unmarshal: "+string(updatedData)))
 		return

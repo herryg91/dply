@@ -24,14 +24,17 @@ func (h *specConfig) GetPort(ctx context.Context, req *pbSpec.GetPortReq) (*pbSp
 	ports := []*pbSpec.Port{}
 	for _, p := range resp.Ports {
 		ports = append(ports, &pbSpec.Port{
-			PortName: p.Name,
-			Port:     int32(p.Port),
-			Protocol: string(p.Protocol),
+			PortName:   p.Name,
+			Port:       int32(p.Port),
+			TargetPort: int32(p.TargetPort),
+			Protocol:   string(p.Protocol),
 		})
 	}
 
 	return &pbSpec.Ports{
-		Ports: ports,
+		AccessType: string(resp.AccessType),
+		ExternalIP: resp.ExternalIP,
+		Ports:      ports,
 	}, nil
 }
 func (h *specConfig) UpsertPort(ctx context.Context, req *pbSpec.UpsertPortReq) (*empty.Empty, error) {
@@ -43,17 +46,28 @@ func (h *specConfig) UpsertPort(ctx context.Context, req *pbSpec.UpsertPortReq) 
 	ports := []entity.PortSpec{}
 	for _, p := range req.Ports {
 		ports = append(ports, entity.PortSpec{
-			Name:     p.PortName,
-			Port:     int(p.Port),
-			Protocol: entity.PortType(p.Protocol),
+			Name:       p.PortName,
+			Port:       int(p.Port),
+			TargetPort: int(p.TargetPort),
+			Protocol:   entity.PortProtocolType(p.Protocol),
+		})
+	}
+
+	if req.AccessType == string(entity.TYPE_LOAD_BALANCER) && req.ExternalIP == "" {
+		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 13102, "Invalid Parameter", &grst_errors.ErrorDetail{
+			Code:    1,
+			Field:   "external_ip",
+			Message: "external ip is required if access_type == LoadBalancer",
 		})
 	}
 
 	err := h.port_uc.Upsert(entity.Port{
-		Env:       req.Env,
-		Name:      req.Name,
-		Ports:     ports,
-		CreatedBy: userCtx.Id,
+		Env:        req.Env,
+		Name:       req.Name,
+		AccessType: entity.AccessType(req.AccessType),
+		ExternalIP: req.ExternalIP,
+		Ports:      ports,
+		CreatedBy:  userCtx.Id,
 	})
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 13101, err.Error())
@@ -73,14 +87,17 @@ func (h *specConfig) GetPortTemplate(ctx context.Context, req *pbSpec.GetPortTem
 	ports := []*pbSpec.Port{}
 	for _, p := range resp.Ports {
 		ports = append(ports, &pbSpec.Port{
-			PortName: p.Name,
-			Port:     int32(p.Port),
-			Protocol: string(p.Protocol),
+			PortName:   p.Name,
+			Port:       int32(p.Port),
+			TargetPort: int32(p.Port),
+			Protocol:   string(p.Protocol),
 		})
 	}
 
 	return &pbSpec.Ports{
-		Ports: ports,
+		AccessType: string(resp.AccessType),
+		ExternalIP: resp.ExternalIP,
+		Ports:      ports,
 	}, nil
 }
 func (h *specConfig) UpdatePortTemplate(ctx context.Context, req *pbSpec.UpdatePortTemplateReq) (*empty.Empty, error) {
@@ -91,14 +108,17 @@ func (h *specConfig) UpdatePortTemplate(ctx context.Context, req *pbSpec.UpdateP
 	ports := []entity.PortSpec{}
 	for _, p := range req.Ports {
 		ports = append(ports, entity.PortSpec{
-			Name:     p.PortName,
-			Port:     int(p.Port),
-			Protocol: entity.PortType(p.Protocol),
+			Name:       p.PortName,
+			Port:       int(p.Port),
+			TargetPort: int(p.TargetPort),
+			Protocol:   entity.PortProtocolType(p.Protocol),
 		})
 	}
 
 	err := h.port_uc.UpsertTemplate(entity.PortTemplate{
 		TemplateName: req.TemplateName,
+		AccessType:   entity.AccessType(req.AccessType),
+		ExternalIP:   req.ExternalIP,
 		Ports:        ports,
 	})
 	if err != nil {

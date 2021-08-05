@@ -230,11 +230,11 @@ func NewServiceParam(in entity.Deployment) *corev1.Service {
 		ports = append(ports, corev1.ServicePort{
 			Name:       p.Name,
 			Port:       int32(p.Port),
-			TargetPort: intstr.FromInt(p.Port),
+			TargetPort: intstr.FromInt(p.TargetPort),
 			Protocol:   apiv1.Protocol(p.Protocol),
 		})
 	}
-	return &corev1.Service{
+	resp := &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
 			APIVersion: "v1",
@@ -252,6 +252,20 @@ func NewServiceParam(in entity.Deployment) *corev1.Service {
 			},
 		},
 	}
+
+	if in.Port.AccessType == entity.Access_Type_ClusterIP {
+		resp.Spec.Type = apiv1.ServiceTypeClusterIP
+	} else if in.Port.AccessType == entity.Access_Type_LoadBalancer {
+		resp.Spec.Type = apiv1.ServiceTypeLoadBalancer
+	} else {
+		resp.Spec.Type = apiv1.ServiceTypeClusterIP
+	}
+
+	if in.Port.ExternalIP != "" {
+		resp.Spec.ExternalIPs = []string{in.Port.ExternalIP}
+	}
+
+	return resp
 }
 
 func UpdateServiceParam(old corev1.Service, in entity.Deployment) *corev1.Service {

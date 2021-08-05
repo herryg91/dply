@@ -24,7 +24,10 @@ func (dm *DeploymentModel) ToDeploymentEntity() *entity.Deployment {
 		return nil
 	}
 	variables := map[string]interface{}{}
-	ports := []entity.PortSpec{}
+	ports := &entity.Port{
+		Env:  dm.Env,
+		Name: dm.Name,
+	}
 	json.Unmarshal(dm.Variables, &variables)
 	json.Unmarshal(dm.Ports, &ports)
 	return &entity.Deployment{
@@ -40,12 +43,7 @@ func (dm *DeploymentModel) ToDeploymentEntity() *entity.Deployment {
 			Variables: variables,
 			CreatedBy: dm.CreatedBy,
 		},
-		Port: entity.Port{
-			Env:       dm.Env,
-			Name:      dm.Name,
-			Ports:     ports,
-			CreatedBy: dm.CreatedBy,
-		},
+		Port:      *ports,
 		Scale:     entity.Scale{},
 		Affinity:  entity.Affinity{},
 		CreatedBy: dm.CreatedBy,

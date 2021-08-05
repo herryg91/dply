@@ -145,17 +145,22 @@ message GetPortReq {
 message UpsertPortReq {
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
-    repeated Port Ports = 3 [json_name="ports"];
+    string AccessType = 3 [json_name="access_type", (cdd.api.validate) = "required|enum=ClusterIP,LoadBalancer"];
+    string ExternalIP = 4 [json_name="external_ip"];
+    repeated Port Ports = 5 [json_name="ports"];
 }
 
 message Ports {
     repeated Port Ports = 1 [json_name="ports"];
+    string AccessType = 2 [json_name="access_type"];
+    string ExternalIP = 3 [json_name="external_ip"];   
 }
 
 message Port {
     string PortName = 1 [json_name="name", (cdd.api.validate) = "required"];
     int32 Port = 2 [json_name="port", (cdd.api.validate) = "required"];
-    string Protocol = 3 [json_name="protocol", (cdd.api.validate) = "required|enum=TCP,UDP,SCTP"];
+    int32 TargetPort = 3 [json_name="target_port", (cdd.api.validate) = "required"];
+    string Protocol = 4 [json_name="protocol", (cdd.api.validate) = "required|enum=TCP,UDP,SCTP"];
 }
 
 message GetPortTemplateReq {
@@ -165,6 +170,8 @@ message GetPortTemplateReq {
 message UpdatePortTemplateReq {
     string TemplateName = 1 [json_name="template_name", (cdd.api.validate) = "required"];
     repeated Port Ports = 2 [json_name="ports"];
+    string AccessType = 3 [json_name="access_type"];
+    string ExternalIP = 4 [json_name="external_ip"];   
 }
 
 // Affinity

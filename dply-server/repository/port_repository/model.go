@@ -26,16 +26,22 @@ func (pm *PortModel) ToPortEntity() *entity.Port {
 		Env:  pm.Env,
 		Name: pm.Name,
 	}
-	json.Unmarshal(pm.Ports, &ports.Ports)
+	json.Unmarshal(pm.Ports, &ports)
 	return ports
 }
 
 func (PortModel) FromPortEntity(p entity.Port) *PortModel {
-	ports, _ := json.Marshal(&p.Ports)
+	portJson := map[string]interface{}{
+		"access_type": string(p.AccessType),
+		"external_ip": p.ExternalIP,
+		"ports":       p.Ports,
+	}
+
+	portJsonMarshalled, _ := json.Marshal(&portJson)
 	return &PortModel{
 		Env:       p.Env,
 		Name:      p.Name,
-		Ports:     ports,
+		Ports:     portJsonMarshalled,
 		CreatedBy: p.CreatedBy,
 	}
 }
@@ -53,17 +59,23 @@ func (pm *PortTemplateModel) ToPortTemplateEntity() *entity.PortTemplate {
 		return nil
 	}
 
-	portSpecs := []entity.PortSpec{}
-	json.Unmarshal(pm.Ports, &portSpecs)
-	return &entity.PortTemplate{
+	resp := &entity.PortTemplate{
 		TemplateName: pm.TemplateName,
-		Ports:        portSpecs,
 	}
+	json.Unmarshal(pm.Ports, &resp)
+	return resp
 }
 func (PortTemplateModel) FromPortTemplateEntity(p entity.PortTemplate) *PortTemplateModel {
-	ports, _ := json.Marshal(&p.Ports)
+	portJson := map[string]interface{}{
+		"access_type": string(p.AccessType),
+		"external_ip": p.ExternalIP,
+		"ports":       p.Ports,
+	}
+
+	portJsonMarshalled, _ := json.Marshal(&portJson)
+	// ports, _ := json.Marshal(&p.Ports)
 	return &PortTemplateModel{
 		TemplateName: p.TemplateName,
-		Ports:        ports,
+		Ports:        portJsonMarshalled,
 	}
 }

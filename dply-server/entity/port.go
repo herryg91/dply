@@ -1,53 +1,71 @@
 package entity
 
 type Port struct {
-	Env       string     `json:"env"`
-	Name      string     `json:"name"`
-	Ports     []PortSpec `json:"ports"`
-	CreatedBy int        `json:"created_by"`
+	Env        string     `json:"env"`
+	Name       string     `json:"name"`
+	AccessType AccessType `json:"access_type"`
+	ExternalIP string     `json:"external_ip"`
+	Ports      []PortSpec `json:"ports"`
+	CreatedBy  int        `json:"created_by"`
 }
 
 type PortSpec struct {
-	Name     string   `json:"name"`
-	Port     int      `json:"port"`
-	Protocol PortType `json:"protocol"`
+	Name       string           `json:"name"`
+	Port       int              `json:"port"`
+	TargetPort int              `json:"target_port"`
+	Protocol   PortProtocolType `json:"protocol"`
 }
 
-type PortType string
+type AccessType string
 
 const (
-	Port_TCP  PortType = "TCP"
-	Port_UDP  PortType = "UDP"
-	Port_SCTP PortType = "SCTP"
+	Access_Type_ClusterIP    AccessType = "ClusterIP"
+	Access_Type_LoadBalancer AccessType = "LoadBalancer"
+)
+
+type PortProtocolType string
+
+const (
+	Port_TCP  PortProtocolType = "TCP"
+	Port_UDP  PortProtocolType = "UDP"
+	Port_SCTP PortProtocolType = "SCTP"
 )
 
 func (Port) DefaultPort(env, name string) *Port {
 	return &Port{
-		Env:  env,
-		Name: name,
+		Env:        env,
+		Name:       name,
+		AccessType: Access_Type_ClusterIP,
+		ExternalIP: "",
 		Ports: []PortSpec{
-			{Name: "http", Port: 80, Protocol: Port_TCP},
+			{Name: "http", Port: 80, TargetPort: 80, Protocol: Port_TCP},
 		},
 	}
 }
 
 type PortTemplate struct {
-	TemplateName string     `json:"template_name"`
+	TemplateName string     `json:"-"`
+	AccessType   AccessType `json:"access_type"`
+	ExternalIP   string     `json:"external_ip"`
 	Ports        []PortSpec `json:"ports"`
 }
 
 func (PortTemplate) DefaultPortTemplate() *PortTemplate {
 	return &PortTemplate{
 		TemplateName: "default",
+		AccessType:   Access_Type_ClusterIP,
+		ExternalIP:   "",
 		Ports: []PortSpec{
-			{Name: "http", Port: 80, Protocol: Port_TCP},
+			{Name: "http", Port: 80, TargetPort: 80, Protocol: Port_TCP},
 		},
 	}
 }
 func (pt *PortTemplate) ToPortEntity(env, name string) *Port {
 	return &Port{
-		Env:   env,
-		Name:  name,
-		Ports: pt.Ports,
+		Env:        env,
+		Name:       name,
+		AccessType: pt.AccessType,
+		ExternalIP: pt.ExternalIP,
+		Ports:      pt.Ports,
 	}
 }
