@@ -11,7 +11,7 @@ type Port struct {
 type PortSpec struct {
 	Name       string   `json:"name"`
 	Port       int      `json:"port"`
-	TargetPort int      `json:"target_port"`
+	RemotePort int      `json:"remote_port"`
 	Protocol   PortType `json:"protocol"`
 }
 

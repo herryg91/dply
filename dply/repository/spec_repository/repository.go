@@ -170,7 +170,7 @@ func (r *repository) GetPort(env, name string) (*entity.Port, error) {
 		portSpecs = append(portSpecs, entity.PortSpec{
 			Name:       p.PortName,
 			Port:       int(p.Port),
-			TargetPort: int(p.TargetPort),
+			RemotePort: int(p.RemotePort),
 			Protocol:   entity.PortType(p.Protocol),
 		})
 	}
@@ -190,7 +190,7 @@ func (r *repository) UpsertPort(data entity.Port) error {
 		portParam = append(portParam, &pbSpec.Port{
 			PortName:   p.Name,
 			Port:       int32(p.Port),
-			TargetPort: int32(p.TargetPort),
+			RemotePort: int32(p.RemotePort),
 			Protocol:   string(p.Protocol),
 		})
 	}
