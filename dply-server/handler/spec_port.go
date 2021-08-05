@@ -53,7 +53,7 @@ func (h *specConfig) UpsertPort(ctx context.Context, req *pbSpec.UpsertPortReq) 
 		})
 	}
 
-	if req.AccessType == string(entity.TYPE_LOAD_BALANCER) && req.ExternalIP == "" {
+	if req.AccessType == string(entity.Access_Type_LoadBalancer) && req.ExternalIP == "" {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 13102, "Invalid Parameter", &grst_errors.ErrorDetail{
 			Code:    1,
 			Field:   "external_ip",
