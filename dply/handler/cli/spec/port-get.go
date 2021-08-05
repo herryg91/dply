@@ -55,7 +55,7 @@ func (c *CmdSpecPortGet) runCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	jsonData, _ := json.MarshalIndent(resp.Ports, "", "    ")
+	jsonData, _ := json.MarshalIndent(resp, "", "    ")
 	fmt.Println(string(jsonData))
 	return nil
 }

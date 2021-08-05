@@ -95,7 +95,7 @@ func (c *CmdSpecGet) runCommand(cmd *cobra.Command, args []string) error {
 	resp := map[string]interface{}{
 		"variables": respEnvar.Variables,
 		"scaling":   respScale,
-		"ports":     respPort.Ports,
+		"ports":     respPort,
 		"affinity":  respAffinity,
 	}
 

@@ -43,7 +43,7 @@ func (uc *usecase) UpsertViaEditor(env, name string, editorApp editor.EditorApp)
 	if err != nil {
 		return false, err
 	}
-	currentData, _ := json.MarshalIndent(getResp.Ports, "", "    ")
+	currentData, _ := json.MarshalIndent(getResp, "", "    ")
 
 	// Get Updated Data via Editor
 	updatedData, err := editor.Open(editorApp, "tmp_port_edit", currentData)
@@ -57,7 +57,7 @@ func (uc *usecase) UpsertViaEditor(env, name string, editorApp editor.EditorApp)
 	}
 
 	data := entity.Port{Env: env, Name: name, Ports: []entity.PortSpec{}}
-	err = json.Unmarshal(updatedData, &data.Ports)
+	err = json.Unmarshal(updatedData, &data)
 	if err != nil {
 		return false, fmt.Errorf("%w: %v", ErrUnexpected, "Error unmarshal: "+string(updatedData))
 	}

@@ -168,12 +168,13 @@ func (r *repository) GetPort(env, name string) (*entity.Port, error) {
 	portSpecs := []entity.PortSpec{}
 	for _, p := range resp.Ports {
 		portSpecs = append(portSpecs, entity.PortSpec{
-			Name:     p.PortName,
-			Port:     int(p.Port),
-			Protocol: entity.PortType(p.Protocol),
+			Name:       p.PortName,
+			Port:       int(p.Port),
+			TargetPort: int(p.TargetPort),
+			Protocol:   entity.PortType(p.Protocol),
 		})
 	}
-	port := &entity.Port{Env: env, Name: name, Ports: portSpecs}
+	port := &entity.Port{Env: env, Name: name, AccessType: entity.AccessType(resp.AccessType), ExternalIP: resp.ExternalIP, Ports: portSpecs}
 	return port, nil
 }
 func (r *repository) UpsertPort(data entity.Port) error {
@@ -187,15 +188,18 @@ func (r *repository) UpsertPort(data entity.Port) error {
 	portParam := []*pbSpec.Port{}
 	for _, p := range data.Ports {
 		portParam = append(portParam, &pbSpec.Port{
-			PortName: p.Name,
-			Port:     int32(p.Port),
-			Protocol: string(p.Protocol),
+			PortName:   p.Name,
+			Port:       int32(p.Port),
+			TargetPort: int32(p.TargetPort),
+			Protocol:   string(p.Protocol),
 		})
 	}
 	_, err := r.cli.UpsertPort(ctx, &pbSpec.UpsertPortReq{
-		Env:   data.Env,
-		Name:  data.Name,
-		Ports: portParam,
+		Env:        data.Env,
+		Name:       data.Name,
+		AccessType: string(data.AccessType),
+		ExternalIP: data.ExternalIP,
+		Ports:      portParam,
 	})
 	if err != nil {
 		grsterr, errparse := grst_errors.NewFromError(err)
