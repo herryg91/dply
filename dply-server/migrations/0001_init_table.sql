@@ -73,7 +73,7 @@ CREATE TABLE port_template (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ( id )
 );
-INSERT INTO port_template (template_name, ports) values ('default', '{"access_type":"ClusterIP","external_ip":"","ports":[{"name":"http","port":80,"target_port":80,"protocol":"TCP"}]}');
+INSERT INTO port_template (template_name, ports) values ('default', '{"access_type":"ClusterIP","external_ip":"","ports":[{"name":"http","port":80,"remote_port":80,"protocol":"TCP"}]}');
 
 CREATE TABLE affinity (
     id INT NOT NULL AUTO_INCREMENT,

@@ -26,7 +26,7 @@ func (h *specConfig) GetPort(ctx context.Context, req *pbSpec.GetPortReq) (*pbSp
 		ports = append(ports, &pbSpec.Port{
 			PortName:   p.Name,
 			Port:       int32(p.Port),
-			TargetPort: int32(p.TargetPort),
+			RemotePort: int32(p.RemotePort),
 			Protocol:   string(p.Protocol),
 		})
 	}
@@ -48,7 +48,7 @@ func (h *specConfig) UpsertPort(ctx context.Context, req *pbSpec.UpsertPortReq) 
 		ports = append(ports, entity.PortSpec{
 			Name:       p.PortName,
 			Port:       int(p.Port),
-			TargetPort: int(p.TargetPort),
+			RemotePort: int(p.RemotePort),
 			Protocol:   entity.PortProtocolType(p.Protocol),
 		})
 	}
@@ -89,7 +89,7 @@ func (h *specConfig) GetPortTemplate(ctx context.Context, req *pbSpec.GetPortTem
 		ports = append(ports, &pbSpec.Port{
 			PortName:   p.Name,
 			Port:       int32(p.Port),
-			TargetPort: int32(p.Port),
+			RemotePort: int32(p.RemotePort),
 			Protocol:   string(p.Protocol),
 		})
 	}
@@ -110,7 +110,7 @@ func (h *specConfig) UpdatePortTemplate(ctx context.Context, req *pbSpec.UpdateP
 		ports = append(ports, entity.PortSpec{
 			Name:       p.PortName,
 			Port:       int(p.Port),
-			TargetPort: int(p.TargetPort),
+			RemotePort: int(p.RemotePort),
 			Protocol:   entity.PortProtocolType(p.Protocol),
 		})
 	}

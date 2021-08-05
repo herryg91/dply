@@ -229,8 +229,8 @@ func NewServiceParam(in entity.Deployment) *corev1.Service {
 	for _, p := range in.Port.Ports {
 		ports = append(ports, corev1.ServicePort{
 			Name:       p.Name,
-			Port:       int32(p.Port),
-			TargetPort: intstr.FromInt(p.TargetPort),
+			Port:       int32(p.RemotePort),
+			TargetPort: intstr.FromInt(p.Port),
 			Protocol:   apiv1.Protocol(p.Protocol),
 		})
 	}
@@ -272,18 +272,18 @@ func UpdateServiceParam(old corev1.Service, in entity.Deployment) *corev1.Servic
 	for _, p := range in.Port.Ports {
 		ports = append(ports, corev1.ServicePort{
 			Name:       p.Name,
-			Port:       int32(p.Port),
-			TargetPort: intstr.FromInt(p.TargetPort),
+			Port:       int32(p.RemotePort),
+			TargetPort: intstr.FromInt(p.Port),
 			Protocol:   apiv1.Protocol(p.Protocol),
 		})
 	}
 	old.Spec.Ports = ports
-	if in.Port.AccessType == entity.Access_Type_ClusterIP && old.Spec.Type != corev1.ServiceType(entity.Access_Type_ClusterIP) {
+	if in.Port.AccessType == entity.Access_Type_ClusterIP {
 		old.Spec.Type = apiv1.ServiceTypeClusterIP
-	} else if in.Port.AccessType == entity.Access_Type_LoadBalancer && old.Spec.Type != corev1.ServiceType(entity.Access_Type_LoadBalancer) {
+	} else if in.Port.AccessType == entity.Access_Type_LoadBalancer {
 		old.Spec.Type = apiv1.ServiceTypeLoadBalancer
 		if in.Port.ExternalIP != "" {
-			old.Spec.ExternalIPs = []string{in.Port.ExternalIP}
+			old.Spec.LoadBalancerIP = in.Port.ExternalIP
 		}
 	} else {
 		old.Spec.Type = apiv1.ServiceTypeClusterIP

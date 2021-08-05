@@ -147,7 +147,7 @@ func (m *migration_0001) Up() error {
 	}
 
 	err = m.db.Exec(`
-	INSERT INTO port_template (template_name, ports) values ('default', '[{"name":"http","port":80,"protocol":"TCP"}]');
+	INSERT INTO port_template (template_name, ports) values ('default', '{"access_type":"ClusterIP","external_ip":"","ports":[{"name":"http","port":80,"remote_port":80,"protocol":"TCP"}]}');
 	`).Error
 	if err != nil {
 		return err

@@ -12,7 +12,7 @@ type Port struct {
 type PortSpec struct {
 	Name       string           `json:"name"`
 	Port       int              `json:"port"`
-	TargetPort int              `json:"target_port"`
+	RemotePort int              `json:"remote_port"`
 	Protocol   PortProtocolType `json:"protocol"`
 }
 
@@ -38,7 +38,7 @@ func (Port) DefaultPort(env, name string) *Port {
 		AccessType: Access_Type_ClusterIP,
 		ExternalIP: "",
 		Ports: []PortSpec{
-			{Name: "http", Port: 80, TargetPort: 80, Protocol: Port_TCP},
+			{Name: "http", Port: 80, RemotePort: 80, Protocol: Port_TCP},
 		},
 	}
 }
@@ -56,7 +56,7 @@ func (PortTemplate) DefaultPortTemplate() *PortTemplate {
 		AccessType:   Access_Type_ClusterIP,
 		ExternalIP:   "",
 		Ports: []PortSpec{
-			{Name: "http", Port: 80, TargetPort: 80, Protocol: Port_TCP},
+			{Name: "http", Port: 80, RemotePort: 80, Protocol: Port_TCP},
 		},
 	}
 }

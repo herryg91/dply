@@ -159,7 +159,7 @@ message Ports {
 message Port {
     string PortName = 1 [json_name="name", (cdd.api.validate) = "required"];
     int32 Port = 2 [json_name="port", (cdd.api.validate) = "required"];
-    int32 TargetPort = 3 [json_name="target_port", (cdd.api.validate) = "required"];
+    int32 RemotePort = 3 [json_name="remote_port", (cdd.api.validate) = "required"];
     string Protocol = 4 [json_name="protocol", (cdd.api.validate) = "required|enum=TCP,UDP,SCTP"];
 }
 
