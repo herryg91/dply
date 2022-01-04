@@ -1,0 +1,84 @@
+# prerequisite:
+## openssl genrsa -out "/local/ca/key.pem" 4096
+## openssl req -new -key "/local/ca/key.pem" -out "/local/ca/cert.pem" -subj '/CN=docker:dind CA' -x509 -days "825"
+
+## kubectl create secret -n dply generic dind-certs \
+##   --from-file=ca.cert.pem=/local/ca/cert.pem \
+##   --from-file=ca.key.pem=/local/ca/key.pem 
+
+# to get client certificate
+## kubectl -n dply cp <pod>:/certs/client/* ~/.dply/certs
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dind
+  namespace: dply
+  labels:
+    app: dind
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dind
+  template:
+    metadata:
+      labels:
+        app: dind
+    spec:
+      containers: 
+        - name: dind
+          image: docker:20.10.11-dind
+          env:
+            - name: DOCKER_TLS_CERTDIR
+              value: /certs
+            - name: DOCKER_TLS_SAN
+              value: DNS:dind.dply.svc.cluster.local,DNS:dind.localhost,DNS:docker.localhost
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "256Mi"
+            requests:
+              memory: "128Mi"
+          securityContext: 
+              privileged: true 
+          volumeMounts:
+            - mountPath: /certs/ca/cert.pem
+              name: ca-cert-pem
+              subPath: cert.pem
+            - mountPath: /certs/ca/key.pem
+              name: ca-key-pem
+              subPath: key.pem
+          ports:
+            - containerPort: 2376
+      volumes:
+          - name: ca-cert-pem
+            secret:
+              secretName: dind-certs
+              items:
+              - key: ca.cert.pem
+                path: cert.pem
+          - name: ca-key-pem
+            secret:
+              secretName: dind-certs
+              items:
+              - key: ca.key.pem
+                path: key.pem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dind
+  namespace: dply
+  labels:
+    app: dind
+spec:
+  selector:
+    app: dind
+  ports:
+    - name: dind-docker
+      protocol: TCP
+      port: 2376
+      targetPort: 2376
+
