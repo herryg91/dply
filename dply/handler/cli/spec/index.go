@@ -19,7 +19,7 @@ type CmdSpec struct {
 }
 
 func New() *CmdSpec {
-	setting := entity.Setting{}.FromFile()
+	cfg := entity.Config{}.FromFile()
 	var spec_repo repository.SpecRepository = nil
 	var specCli pbSpec.SpecApiClient = nil
 
@@ -28,9 +28,9 @@ func New() *CmdSpec {
 	var port_uc port_usecase.UseCase = nil
 	var affinity_uc affinity_usecase.UseCase = nil
 
-	if setting != nil {
+	if cfg != nil {
 		var err error
-		specCli, err = pbSpec.NewSpecApiGrstClient(setting.ServerHostGrpc, nil)
+		specCli, err = pbSpec.NewSpecApiGrstClient(cfg.DplyServerHost, nil)
 		if err != nil {
 			log.Panicln("Failed to initialized cli for dply-server", err)
 		}
@@ -51,13 +51,13 @@ func New() *CmdSpec {
 
 	c.AddCommand(newSpecGet(envar_uc, port_uc, scale_uc, affinity_uc).Command)
 	c.AddCommand(newSpecScalingGet(scale_uc).Command)
-	c.AddCommand(newSpecScalingEdit(scale_uc, setting).Command)
+	c.AddCommand(newSpecScalingEdit(scale_uc, cfg).Command)
 	c.AddCommand(newSpecEnvarGet(envar_uc).Command)
-	c.AddCommand(newSpecEnvarEdit(envar_uc, setting).Command)
+	c.AddCommand(newSpecEnvarEdit(envar_uc, cfg).Command)
 	c.AddCommand(newSpecPortGet(port_uc).Command)
-	c.AddCommand(newSpecPortEdit(port_uc, setting).Command)
+	c.AddCommand(newSpecPortEdit(port_uc, cfg).Command)
 	c.AddCommand(newSpecAffinityGet(affinity_uc).Command)
-	c.AddCommand(newSpecAffinityEdit(affinity_uc, setting).Command)
+	c.AddCommand(newSpecAffinityEdit(affinity_uc, cfg).Command)
 
 	return c
 }

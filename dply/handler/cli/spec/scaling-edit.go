@@ -15,14 +15,14 @@ import (
 type CmdSpecScalingEdit struct {
 	*cobra.Command
 	scale_uc scale_usecase.UseCase
-	setting  *entity.Setting
+	cfg      *entity.Config
 
 	env  string
 	name string
 }
 
-func newSpecScalingEdit(scale_uc scale_usecase.UseCase, setting *entity.Setting) *CmdSpecScalingEdit {
-	c := &CmdSpecScalingEdit{scale_uc: scale_uc, setting: setting}
+func newSpecScalingEdit(scale_uc scale_usecase.UseCase, cfg *entity.Config) *CmdSpecScalingEdit {
+	c := &CmdSpecScalingEdit{scale_uc: scale_uc, cfg: cfg}
 	c.Command = &cobra.Command{
 		Use:     "scaling-edit",
 		Aliases: []string{"se"},
@@ -37,9 +37,9 @@ func newSpecScalingEdit(scale_uc scale_usecase.UseCase, setting *entity.Setting)
 
 func (c *CmdSpecScalingEdit) runCommand(cmd *cobra.Command, args []string) error {
 	if c.scale_uc == nil {
-		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
-	} else if c.setting == nil {
-		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
+		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
+	} else if c.cfg == nil {
+		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
 	} else if c.env == "" {
 		return errors.New("`-e` is required")
 	} else if c.name == "" {
@@ -50,7 +50,7 @@ func (c *CmdSpecScalingEdit) runCommand(cmd *cobra.Command, args []string) error
 		c.name = data.Name
 	}
 
-	ok, err := c.scale_uc.UpsertViaEditor(c.env, c.name, editor.EditorApp(c.setting.Editor))
+	ok, err := c.scale_uc.UpsertViaEditor(c.env, c.name, editor.EditorApp(c.cfg.Editor))
 	if err != nil {
 		if errors.Is(err, scale_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

@@ -23,7 +23,7 @@ type CmdStatus struct {
 }
 
 func NewCmdStatus() *CmdStatus {
-	setting := entity.Setting{}.FromFile()
+	cfg := entity.Config{}.FromFile()
 	var user_repo repository.UserRepository = nil
 	var auth_uc auth_usecase.UseCase = nil
 	var userCli pbUser.UserApiClient = nil
@@ -32,14 +32,14 @@ func NewCmdStatus() *CmdStatus {
 	var server_uc server_usecase.UseCase = nil
 	var serverCli pbServer.ServerApiClient = nil
 
-	if setting != nil {
+	if cfg != nil {
 		var err error
-		userCli, err = pbUser.NewUserApiGrstClient(setting.ServerHostGrpc, nil)
+		userCli, err = pbUser.NewUserApiGrstClient(cfg.DplyServerHost, nil)
 		if err != nil {
 			log.Panicln("Failed to initialized cli for dply-server:", err)
 		}
 
-		serverCli, err = pbServer.NewServerApiGrstClient(setting.ServerHostGrpc, nil)
+		serverCli, err = pbServer.NewServerApiGrstClient(cfg.DplyServerHost, nil)
 		if err != nil {
 			log.Panicln("Failed to initialized cli for dply-server", err)
 		}
@@ -66,10 +66,10 @@ func NewCmdStatus() *CmdStatus {
 
 func (c *CmdStatus) runCommand(cmd *cobra.Command, args []string) error {
 	if c.auth_uc == nil || c.server_uc == nil {
-		return errors.New("You haven't setting up dply-server setting. Run `dply-cli setup setting`")
+		return errors.New("You haven't configure dply-server host. Run `dply config edit`")
 	}
-	setting := entity.Setting{}.FromFile()
-	if setting == nil {
+	cfg := entity.Config{}.FromFile()
+	if cfg == nil {
 		fmt.Println("dply-server: Not Connect")
 		fmt.Println("login status: Not Login")
 		return nil
@@ -77,7 +77,7 @@ func (c *CmdStatus) runCommand(cmd *cobra.Command, args []string) error {
 	isConnectServer := c.server_uc.Status()
 	isLogin, userInfo := c.auth_uc.GetStatus()
 	if isConnectServer {
-		fmt.Println("dply-server: Connected (" + setting.ServerHostGrpc + ")")
+		fmt.Println("dply-server: Connected (" + cfg.DplyServerHost + ")")
 	} else {
 		fmt.Println("dply-server: Not Connect")
 	}

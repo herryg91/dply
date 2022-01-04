@@ -15,14 +15,14 @@ import (
 type CmdSpecAffinityEdit struct {
 	*cobra.Command
 	affinity_uc affinity_usecase.UseCase
-	setting     *entity.Setting
+	cfg         *entity.Config
 
 	env  string
 	name string
 }
 
-func newSpecAffinityEdit(affinity_uc affinity_usecase.UseCase, setting *entity.Setting) *CmdSpecAffinityEdit {
-	c := &CmdSpecAffinityEdit{affinity_uc: affinity_uc, setting: setting}
+func newSpecAffinityEdit(affinity_uc affinity_usecase.UseCase, cfg *entity.Config) *CmdSpecAffinityEdit {
+	c := &CmdSpecAffinityEdit{affinity_uc: affinity_uc, cfg: cfg}
 	c.Command = &cobra.Command{
 		Use:     "affinity-edit",
 		Aliases: []string{"ae"},
@@ -37,9 +37,9 @@ func newSpecAffinityEdit(affinity_uc affinity_usecase.UseCase, setting *entity.S
 
 func (c *CmdSpecAffinityEdit) runCommand(cmd *cobra.Command, args []string) error {
 	if c.affinity_uc == nil {
-		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
-	} else if c.setting == nil {
-		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
+		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
+	} else if c.cfg == nil {
+		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
 	} else if c.env == "" {
 		return errors.New("`-e` is required")
 	} else if c.name == "" {
@@ -50,7 +50,7 @@ func (c *CmdSpecAffinityEdit) runCommand(cmd *cobra.Command, args []string) erro
 		c.name = data.Name
 	}
 
-	ok, err := c.affinity_uc.UpsertViaEditor(c.env, c.name, editor.EditorApp(c.setting.Editor))
+	ok, err := c.affinity_uc.UpsertViaEditor(c.env, c.name, editor.EditorApp(c.cfg.Editor))
 	if err != nil {
 		if errors.Is(err, affinity_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

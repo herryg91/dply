@@ -4,7 +4,7 @@ name: dply
 # contract: 
 #   output-grst: handler/grst/
 #   proto-files:
-#     - contract/goalsetting.proto
+#     - contract/contract.proto
 dependencies:
   output-grst: clients/grst/
   services:

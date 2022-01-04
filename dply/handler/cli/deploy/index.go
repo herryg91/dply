@@ -16,13 +16,13 @@ type CmdDeploy struct {
 }
 
 func New() *CmdDeploy {
-	setting := entity.Setting{}.FromFile()
+	cfg := entity.Config{}.FromFile()
 	var deploy_repo repository.DeployRepository = nil
 	var deploy_uc deploy_usecase.UseCase = nil
 	var deployCli pbDeploy.DeployApiClient = nil
-	if setting != nil {
+	if cfg != nil {
 		var err error
-		deployCli, err = pbDeploy.NewDeployApiGrstClient(setting.ServerHostGrpc, nil)
+		deployCli, err = pbDeploy.NewDeployApiGrstClient(cfg.DplyServerHost, nil)
 		if err != nil {
 			log.Panicln("Failed to initialized cli for dply-server", err)
 		}

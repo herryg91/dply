@@ -35,7 +35,7 @@ func newSpecEnvarGet(envar_uc envar_usecase.UseCase) *CmdSpecEnvarGet {
 
 func (c *CmdSpecEnvarGet) runCommand(cmd *cobra.Command, args []string) error {
 	if c.envar_uc == nil {
-		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
+		return errors.New("You haven't setup the configuration. command: `dply config edit` then set the `dply_server_host``")
 	} else if c.env == "" {
 		return errors.New("`--env / -e` is required")
 	} else if c.name == "" {

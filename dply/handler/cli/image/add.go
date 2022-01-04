@@ -36,7 +36,7 @@ func newCmdImageAdd(image_uc image_usecase.UseCase) *CmdImageAdd {
 
 func (c *CmdImageAdd) runCommand(cmd *cobra.Command, args []string) error {
 	if c.image_uc == nil {
-		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
+		return errors.New("You haven't setup the configuration. command: `dply config edit` then set the `dply_server_host``")
 	} else if c.name == "" {
 		data, err := serviceYaml.GetServiceYAML("service.yaml")
 		if err != nil || data.Name == "" {

@@ -3,6 +3,7 @@ package image_usecase
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/herryg91/dply/dply/app/repository"
 	"github.com/herryg91/dply/dply/entity"
@@ -25,6 +26,61 @@ func (uc *usecase) Add(repoName, image, description string) error {
 	}
 	return nil
 }
+
+func (uc *usecase) Create(name, tag_prefix, description string) error {
+	// Preparation
+	current_folder, _ := os.Getwd()
+	if _, err := os.Stat(current_folder + "/Dockerfile"); errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("%w: %v", ErrUnexpected, "Dockerfile not exist")
+	}
+
+	if len(tag_prefix) > 0 && string(tag_prefix[len(tag_prefix)-1]) != "/" {
+		tag_prefix += "/"
+	}
+	repo_full_name := tag_prefix + name
+
+	fmt.Println("---------- 1. Building Docker Image ----------")
+	docker_image_ids, err := uc.repo.BuildImage(repo_full_name, current_folder)
+	if err != nil {
+		if errors.Is(err, repository.ErrUnauthorized) {
+			return fmt.Errorf("%w: %v", ErrUnauthorized, "You are not login")
+		}
+		return fmt.Errorf("%w: %v", ErrUnexpected, err.Error())
+	}
+
+	fmt.Println("---------- 2. Push Image to Registry Server ----------")
+	digest, err := uc.repo.PushImage(repo_full_name)
+	if err != nil {
+		if errors.Is(err, repository.ErrUnauthorized) {
+			return fmt.Errorf("%w: %v", ErrUnauthorized, "You are not login")
+		}
+		return fmt.Errorf("%w: %v", ErrUnexpected, err.Error())
+	}
+	fmt.Println("Successfully push image, digest: ", digest)
+
+	fmt.Println("---------- 3. Add Image to Dply ----------")
+	err = uc.Add(name, repo_full_name+"@"+digest, description)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Push Image done")
+
+	fmt.Println("---------- 4. Clean Up Docker Images ----------")
+	for _, img := range docker_image_ids {
+		fmt.Println("Delete " + img + "")
+		err = uc.repo.DeleteImage(img)
+		if err != nil {
+			if errors.Is(err, repository.ErrUnauthorized) {
+				return fmt.Errorf("%w: %v", ErrUnauthorized, "You are not login")
+			}
+			return fmt.Errorf("%w: %v", ErrUnexpected, err.Error())
+		}
+	}
+	fmt.Println()
+	fmt.Println("Done")
+	return nil
+}
+
 func (uc *usecase) Remove(repoName, digest string) error {
 	err := uc.repo.Remove(repoName, digest)
 	if err != nil {

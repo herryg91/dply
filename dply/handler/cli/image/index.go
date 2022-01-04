@@ -23,22 +23,25 @@ func New() *CmdImage {
 		Long:  "Container image management",
 	}
 
-	setting := entity.Setting{}.FromFile()
+	cfg := entity.Config{}.FromFile()
 	var image_repo repository.ImageRepository = nil
 	var image_uc image_usecase.UseCase = nil
 	var imageCli pbImage.ImageApiClient = nil
-	if setting != nil {
+	if cfg != nil {
 		var err error
-		imageCli, err = pbImage.NewImageApiGrstClient(setting.ServerHostGrpc, nil)
+		imageCli, err = pbImage.NewImageApiGrstClient(cfg.DplyServerHost, nil)
 		if err != nil {
 			log.Panicln("Failed to initialized cli for dply-server", err)
 		}
 
-		image_repo = image_repository.New(imageCli)
+		image_repo, err = image_repository.New(imageCli, cfg)
+		if err != nil {
+			log.Panicln("Failed to initialized image repository", err)
+		}
 		image_uc = image_usecase.New(image_repo)
 	}
 	c.AddCommand(newCmdImageAdd(image_uc).Command)
 	c.AddCommand(newCmdImageList(image_uc).Command)
-	// c.AddCommand(newCmdImageRemove(image_uc).Command)
+	c.AddCommand(newCmdImageCreate(image_uc).Command)
 	return c
 }

@@ -15,14 +15,14 @@ import (
 type CmdSpecPortEdit struct {
 	*cobra.Command
 	port_uc port_usecase.UseCase
-	setting *entity.Setting
+	cfg     *entity.Config
 
 	env  string
 	name string
 }
 
-func newSpecPortEdit(port_uc port_usecase.UseCase, setting *entity.Setting) *CmdSpecPortEdit {
-	c := &CmdSpecPortEdit{port_uc: port_uc, setting: setting}
+func newSpecPortEdit(port_uc port_usecase.UseCase, cfg *entity.Config) *CmdSpecPortEdit {
+	c := &CmdSpecPortEdit{port_uc: port_uc, cfg: cfg}
 	c.Command = &cobra.Command{
 		Use:     "port-edit",
 		Aliases: []string{"pe"},
@@ -37,9 +37,9 @@ func newSpecPortEdit(port_uc port_usecase.UseCase, setting *entity.Setting) *Cmd
 
 func (c *CmdSpecPortEdit) runCommand(cmd *cobra.Command, args []string) error {
 	if c.port_uc == nil {
-		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
-	} else if c.setting == nil {
-		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
+		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
+	} else if c.cfg == nil {
+		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
 	} else if c.env == "" {
 		return errors.New("`-e` is required")
 	} else if c.name == "" {
@@ -50,7 +50,7 @@ func (c *CmdSpecPortEdit) runCommand(cmd *cobra.Command, args []string) error {
 		c.name = data.Name
 	}
 
-	ok, err := c.port_uc.UpsertViaEditor(c.env, c.name, editor.EditorApp(c.setting.Editor))
+	ok, err := c.port_uc.UpsertViaEditor(c.env, c.name, editor.EditorApp(c.cfg.Editor))
 	if err != nil {
 		if errors.Is(err, port_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

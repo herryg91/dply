@@ -32,7 +32,7 @@ func newDeployReload(deploy_uc deploy_usecase.UseCase) *CmdDeployReload {
 
 func (c *CmdDeployReload) runCommand(cmd *cobra.Command, args []string) error {
 	if c.deploy_uc == nil {
-		return errors.New("You haven't configure setting. command: `dply-cli setting --server=<dply_server_host>`")
+		return errors.New("You haven't setup the configuration. command: `dply config edit` then set the `dply_server_host``")
 	} else if c.env == "" {
 		return errors.New("`-e` is required")
 	} else if c.name == "" {

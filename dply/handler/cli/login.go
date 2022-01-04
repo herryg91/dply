@@ -24,13 +24,13 @@ type CmdLogin struct {
 }
 
 func NewCmdLogin() *CmdLogin {
-	setting := entity.Setting{}.FromFile()
+	cfg := entity.Config{}.FromFile()
 	var user_repo repository.UserRepository = nil
 	var auth_uc auth_usecase.UseCase = nil
 	var userCli pbUser.UserApiClient = nil
-	if setting != nil {
+	if cfg != nil {
 		var err error
-		userCli, err = pbUser.NewUserApiGrstClient(setting.ServerHostGrpc, nil)
+		userCli, err = pbUser.NewUserApiGrstClient(cfg.DplyServerHost, nil)
 		if err != nil {
 			log.Panicln("Failed to initialized cli for dply-server:", err)
 		}
@@ -60,7 +60,7 @@ func (c *CmdLogin) runCommand(cmd *cobra.Command, args []string) error {
 	} else if err := checkmail.ValidateFormat(c.email); err != nil {
 		return errors.New("`--email / -e` is not email format, got: " + c.email)
 	} else if c.auth_uc == nil {
-		return errors.New("You haven't setting up dply-server setting. Run `dply-cli setup setting`")
+		return errors.New("You haven't configure dply-server host. Run `dply config edit`")
 	}
 
 	err := c.auth_uc.Login(c.email, c.password)
