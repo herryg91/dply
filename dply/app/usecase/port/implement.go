@@ -56,7 +56,7 @@ func (uc *usecase) UpsertViaEditor(project, env, name string, editorApp editor.E
 		return false, nil
 	}
 
-	data := entity.Port{Env: env, Name: name, Ports: []entity.PortSpec{}}
+	data := entity.Port{Project: project, Env: env, Name: name, Ports: []entity.PortSpec{}}
 	err = json.Unmarshal(updatedData, &data)
 	if err != nil {
 		return false, fmt.Errorf("%w: %v", ErrUnexpected, "Error unmarshal: "+string(updatedData))

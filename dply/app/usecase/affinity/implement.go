@@ -63,7 +63,7 @@ func (uc *usecase) UpsertViaEditor(project, env, name string, editorApp editor.E
 		return false, nil
 	}
 
-	data := entity.Affinity{Env: env, Name: name, NodeAffinity: []entity.AffinityTerm{}, PodAffinity: []entity.AffinityTerm{}, PodAntiAffinity: []entity.AffinityTerm{}}
+	data := entity.Affinity{Project: project, Env: env, Name: name, NodeAffinity: []entity.AffinityTerm{}, PodAffinity: []entity.AffinityTerm{}, PodAntiAffinity: []entity.AffinityTerm{}}
 	err = json.Unmarshal(updatedData, &data)
 	if err != nil {
 		return false, fmt.Errorf("%w: %v", ErrUnexpected, "Error unmarshal: "+string(updatedData))

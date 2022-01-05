@@ -56,7 +56,7 @@ func (uc *usecase) UpsertViaEditor(project, env, name string, editorApp editor.E
 		return false, nil
 	}
 
-	data := entity.Scale{Env: env, Name: name}
+	data := entity.Scale{Project: project, Env: env, Name: name}
 	err = json.Unmarshal(updatedData, &data)
 	if err != nil {
 		return false, fmt.Errorf("%w: %v", ErrUnexpected, "Error unmarshal: "+string(updatedData))
