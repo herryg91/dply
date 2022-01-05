@@ -16,6 +16,7 @@ import (
 	envar_usecase "github.com/herryg91/dply/dply-server/app/usecase/envar"
 	image_usecase "github.com/herryg91/dply/dply-server/app/usecase/image"
 	port_usecase "github.com/herryg91/dply/dply-server/app/usecase/port"
+	project_usecase "github.com/herryg91/dply/dply-server/app/usecase/project"
 	scale_usecase "github.com/herryg91/dply/dply-server/app/usecase/scale"
 	user_usecase "github.com/herryg91/dply/dply-server/app/usecase/user"
 	"github.com/herryg91/dply/dply-server/config"
@@ -23,6 +24,7 @@ import (
 	"github.com/herryg91/dply/dply-server/handler"
 	pbDeploy "github.com/herryg91/dply/dply-server/handler/grst/deploy"
 	pbImage "github.com/herryg91/dply/dply-server/handler/grst/image"
+	pbProject "github.com/herryg91/dply/dply-server/handler/grst/project"
 	pbServer "github.com/herryg91/dply/dply-server/handler/grst/server"
 	pbSpec "github.com/herryg91/dply/dply-server/handler/grst/spec"
 	pbUser "github.com/herryg91/dply/dply-server/handler/grst/user"
@@ -38,6 +40,7 @@ import (
 	"github.com/herryg91/dply/dply-server/repository/k8s_repository"
 	"github.com/herryg91/dply/dply-server/repository/migration_repository"
 	"github.com/herryg91/dply/dply-server/repository/port_repository"
+	"github.com/herryg91/dply/dply-server/repository/project_repository"
 	"github.com/herryg91/dply/dply-server/repository/scale_repository"
 	"github.com/herryg91/dply/dply-server/repository/user_repository"
 	"github.com/sirupsen/logrus"
@@ -90,6 +93,10 @@ func main() {
 	if err != nil {
 		log.Panicln(err)
 	}
+
+	project_repo := project_repository.New(db)
+	project_uc := project_usecase.New(project_repo)
+	project_hndl := handler.NewProjectHandler(project_uc)
 
 	scale_repo := scale_repository.New(db)
 	scale_uc := scale_usecase.New(scale_repo)
@@ -149,6 +156,10 @@ func main() {
 			"/spec.SpecApi/UpsertAffinity",
 			"/deploy.DeployApi/DeployImage",
 			"/deploy.DeployApi/Redeploy",
+
+			"/project.ProjectApi/GetAll",
+			"/project.ProjectApi/Create",
+			"/project.ProjectApi/Delete",
 		})),
 	)
 
@@ -161,6 +172,7 @@ func main() {
 	pbImage.RegisterImageApiGrstServer(grstServer, image_hndl)
 	pbDeploy.RegisterDeployApiGrstServer(grstServer, deploy_hndl)
 	pbSpec.RegisterSpecApiGrstServer(grstServer, spec_hndl)
+	pbProject.RegisterProjectApiGrstServer(grstServer, project_hndl)
 	pbServer.RegisterServerApiGrstServer(grstServer, handler.NewServerHandler())
 	if err := <-grstServer.ListenAndServeGrst(); err != nil {
 		logrus.Panicln("Failed to Run Grpcrest Server:", err)

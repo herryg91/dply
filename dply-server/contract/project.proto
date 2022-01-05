@@ -1,0 +1,50 @@
+syntax = "proto3";
+package project;
+option go_package = ".;project";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "cdd/api/cddext.proto";
+
+service ProjectApi {
+    rpc GetAll(google.protobuf.Empty) returns (Projects) {
+        option (google.api.http) = {
+            get: "/projects"
+        };
+    }
+    rpc Create(CreateReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/project/create"
+            body: "*"
+        };
+    }
+    rpc Delete(DeleteReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/project/delete"
+            body: "*"
+        };
+    }
+    
+}
+
+// Variable
+
+message Project {
+    int32 Id = 1 [json_name="project"];
+    string Name = 2 [json_name="name"];
+    string Description = 3 [json_name="description"];
+}
+
+message Projects {
+    repeated Project Projects = 1 [json_name="projects"];
+}
+
+message CreateReq {
+    string Name = 1 [json_name="name", (cdd.api.validate) = "required"];
+    string Description = 2 [json_name="description"];
+}
+
+message DeleteReq {
+    string Name = 1 [json_name="name", (cdd.api.validate) = "required"];
+}

@@ -9,3 +9,4 @@ contract:
     - contract/spec.proto
     - contract/deploy.proto
     - contract/server.proto
+    - contract/project.proto
