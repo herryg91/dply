@@ -1,6 +1,7 @@
 package entity
 
 type Scale struct {
+	Project              string `json:"project"`
 	Env                  string `json:"env"`
 	Name                 string `json:"name"`
 	MinReplica           int    `json_name:"min_replica"`
@@ -13,8 +14,9 @@ type Scale struct {
 	CreatedBy            int    `json:"created_by"`
 }
 
-func (Scale) DefaultScale(env, name string) *Scale {
+func (Scale) DefaultScale(project, env, name string) *Scale {
 	s := &Scale{}
+	s.Project = project
 	s.Env = env
 	s.Name = name
 	s.MinReplica = 1

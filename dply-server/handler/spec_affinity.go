@@ -16,7 +16,7 @@ func (h *specConfig) GetAffinity(ctx context.Context, req *pbSpec.GetAffinityReq
 	if err := pbSpec.ValidateRequest(req); err != nil {
 		return nil, err
 	}
-	resp, err := h.affinity_uc.Get(req.Env, req.Name)
+	resp, err := h.affinity_uc.Get(req.Project, req.Env, req.Name)
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 14001, err.Error())
 	}
@@ -63,6 +63,7 @@ func (h *specConfig) UpsertAffinity(ctx context.Context, req *pbSpec.UpsertAffin
 	}
 
 	err := h.affinity_uc.Upsert(entity.Affinity{
+		Project:         req.Project,
 		Env:             req.Env,
 		Name:            req.Name,
 		NodeAffinity:    nodeAffinity,

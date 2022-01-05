@@ -20,9 +20,9 @@ func New(db *gorm.DB) repository_intf.DeploymentRepository {
 	return &repository{db, "deployment"}
 }
 
-func (r *repository) Get(env, name string) (*entity.Deployment, error) {
+func (r *repository) Get(project, env, name string) (*entity.Deployment, error) {
 	deploymentModel := &DeploymentModel{}
-	err := r.db.Table(r.table).Where("env = ? AND name = ?", env, name).Order("id desc").Limit(1).First(&deploymentModel).Error
+	err := r.db.Table(r.table).Where("project = ? AND env = ? AND name = ?", project, env, name).Order("id desc").Limit(1).First(&deploymentModel).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, repository_intf.ErrDeploymentNotFound
@@ -43,6 +43,7 @@ func (r *repository) Create(in entity.Deployment) error {
 
 	timeNow := time.Now().UTC()
 	deploymentModel := &DeploymentModel{
+		Project:     in.Project,
 		Env:         in.Env,
 		Name:        in.Name,
 		ImageDigest: in.DeploymentImage.Digest,

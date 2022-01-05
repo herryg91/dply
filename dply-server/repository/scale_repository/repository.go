@@ -20,9 +20,9 @@ func New(db *gorm.DB) repository_intf.ScaleRepository {
 	return &repository{db, "scale"}
 }
 
-func (r *repository) Get(env, name string) (*entity.Scale, error) {
+func (r *repository) Get(project, env, name string) (*entity.Scale, error) {
 	scaleModel := &ScaleModel{}
-	err := r.db.Table(r.table).Where("env = ? AND name = ?", env, name).First(&scaleModel).Error
+	err := r.db.Table(r.table).Where("project = ? AND env = ? AND name = ?", project, env, name).First(&scaleModel).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, repository_intf.ErrScaleNotFound

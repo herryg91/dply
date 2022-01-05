@@ -17,7 +17,7 @@ func (uc *usecase) imageToDigest(image string) (string, error) {
 	return fullDigest, nil
 }
 
-func (uc *usecase) generateShortDigest(repoName, fullDigest string) (string, error) {
+func (uc *usecase) generateShortDigest(fullDigest string) (string, error) {
 	digestLength := 12
 	loop := 0
 	maxLoop := 10

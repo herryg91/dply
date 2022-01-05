@@ -9,6 +9,7 @@ import (
 
 type PortModel struct {
 	Id        int        `gorm:"column:id"`
+	Project   string     `gorm:"column:project"`
 	Env       string     `gorm:"column:env"`
 	Name      string     `gorm:"column:name"`
 	Ports     []byte     `gorm:"column:ports"`
@@ -23,8 +24,9 @@ func (pm *PortModel) ToPortEntity() *entity.Port {
 	}
 
 	ports := &entity.Port{
-		Env:  pm.Env,
-		Name: pm.Name,
+		Project: pm.Project,
+		Env:     pm.Env,
+		Name:    pm.Name,
 	}
 	json.Unmarshal(pm.Ports, &ports)
 	return ports
@@ -39,6 +41,7 @@ func (PortModel) FromPortEntity(p entity.Port) *PortModel {
 
 	portJsonMarshalled, _ := json.Marshal(&portJson)
 	return &PortModel{
+		Project:   p.Project,
 		Env:       p.Env,
 		Name:      p.Name,
 		Ports:     portJsonMarshalled,

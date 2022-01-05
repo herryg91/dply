@@ -9,6 +9,6 @@ import (
 var ErrScaleNotFound = errors.New("Service's scaling config not found")
 
 type ScaleRepository interface {
-	Get(env, name string) (*entity.Scale, error)
+	Get(project, env, name string) (*entity.Scale, error)
 	Upsert(data entity.Scale) error
 }

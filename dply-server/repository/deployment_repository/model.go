@@ -9,6 +9,7 @@ import (
 
 type DeploymentModel struct {
 	Id          int        `gorm:"column:id"`
+	Project     string     `gorm:"column:project"`
 	Env         string     `gorm:"column:env"`
 	Name        string     `gorm:"column:name"`
 	ImageDigest string     `gorm:"column:image_digest"`
@@ -25,19 +26,23 @@ func (dm *DeploymentModel) ToDeploymentEntity() *entity.Deployment {
 	}
 	variables := map[string]interface{}{}
 	ports := &entity.Port{
-		Env:  dm.Env,
-		Name: dm.Name,
+		Project: dm.Project,
+		Env:     dm.Env,
+		Name:    dm.Name,
 	}
 	json.Unmarshal(dm.Variables, &variables)
 	json.Unmarshal(dm.Ports, &ports)
 	return &entity.Deployment{
-		Id:   dm.Id,
-		Env:  dm.Env,
-		Name: dm.Name,
+		Id:      dm.Id,
+		Project: dm.Project,
+		Env:     dm.Env,
+		Name:    dm.Name,
 		DeploymentImage: entity.Image{
-			Digest: dm.ImageDigest,
+			Project: dm.Project,
+			Digest:  dm.ImageDigest,
 		},
 		Envar: entity.Envar{
+			Project:   dm.Project,
 			Env:       dm.Env,
 			Name:      dm.Name,
 			Variables: variables,

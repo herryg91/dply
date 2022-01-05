@@ -17,8 +17,8 @@ func New(envar_repo repository.EnvarRepository) UseCase {
 	return &usecase{envar_repo: envar_repo}
 }
 
-func (uc *usecase) Get(env string, name string) (*entity.Envar, error) {
-	resp, err := uc.envar_repo.Get(env, name)
+func (uc *usecase) Get(project string, env string, name string) (*entity.Envar, error) {
+	resp, err := uc.envar_repo.Get(project, env, name)
 	if err != nil {
 		if errors.Is(err, repository.ErrEnvarNotFound) {
 			return entity.Envar{}.DefaultEnvar(env, name), nil

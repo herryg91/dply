@@ -20,9 +20,9 @@ func New(db *gorm.DB) repository_intf.EnvarRepository {
 	return &repository{db, "envar"}
 }
 
-func (r *repository) Get(env, name string) (*entity.Envar, error) {
+func (r *repository) Get(project, env, name string) (*entity.Envar, error) {
 	envarModel := &EnvarModel{}
-	err := r.db.Table(r.table).Where("env = ? AND name = ?", env, name).First(&envarModel).Error
+	err := r.db.Table(r.table).Where("project = ? AND env = ? AND name = ?", project, env, name).First(&envarModel).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, repository_intf.ErrEnvarNotFound
@@ -31,6 +31,7 @@ func (r *repository) Get(env, name string) (*entity.Envar, error) {
 	}
 	return envarModel.ToEnvarEntity(), nil
 }
+
 func (r *repository) Upsert(data entity.Envar) error {
 	timeNow := time.Now().UTC()
 

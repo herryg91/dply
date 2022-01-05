@@ -90,11 +90,13 @@ service SpecApi {
 // Variable
 
 message GetEnvarReq {
+    string Project = 3 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
 }
 
 message UpsertEnvarReq {
+    string Project = 4 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
     string Variables = 3 [json_name="variables", (cdd.api.validate) = "required|json"];
@@ -107,11 +109,13 @@ message Envar {
 // Scale
 
 message GetScaleReq {
+    string Project = 3 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
 }
 
 message UpsertScaleReq {
+    string Project = 10 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
     int32 MinReplica = 3 [json_name="min_replica", (cdd.api.validate) = "required|min=1"];
@@ -124,6 +128,7 @@ message UpsertScaleReq {
 }
 
 message Scale {
+    string Project = 1 [json_name="project"];
     string Env = 2 [json_name="env"];
     string Name = 3 [json_name="name"];
     int32 MinReplica = 4 [json_name="min_replica"];
@@ -138,11 +143,13 @@ message Scale {
 // Port
 
 message GetPortReq {
+    string Project = 3 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
 }
 
 message UpsertPortReq {
+    string Project = 6 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
     string AccessType = 3 [json_name="access_type", (cdd.api.validate) = "required|enum=ClusterIP,LoadBalancer"];
@@ -177,11 +184,13 @@ message UpdatePortTemplateReq {
 // Affinity
 
 message GetAffinityReq {
+    string Project = 3 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
 }
 
 message UpsertAffinityReq {
+    string Project = 6 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
     repeated AffinityTerm NodeAffinity = 3 [json_name="node_affinity"];

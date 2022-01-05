@@ -9,6 +9,7 @@ import (
 
 type AffinityModel struct {
 	Id        int        `gorm:"column:id"`
+	Project   string     `gorm:"column:project"`
 	Env       string     `gorm:"column:env"`
 	Name      string     `gorm:"column:name"`
 	Affinity  []byte     `gorm:"column:affinity"`
@@ -23,6 +24,7 @@ func (am *AffinityModel) ToAffinityEntity() *entity.Affinity {
 	}
 
 	affinity := &entity.Affinity{
+		Project:   am.Project,
 		Env:       am.Env,
 		Name:      am.Name,
 		CreatedBy: am.CreatedBy,
@@ -40,6 +42,7 @@ func (AffinityModel) FromAffinityEntity(a entity.Affinity) *AffinityModel {
 	affinityJson, _ := json.Marshal(&affinity)
 
 	return &AffinityModel{
+		Project:   a.Project,
 		Env:       a.Env,
 		Name:      a.Name,
 		Affinity:  affinityJson,

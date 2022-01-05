@@ -19,6 +19,7 @@ const (
 )
 
 type Affinity struct {
+	Project         string         `json:"project"`
 	Env             string         `json:"env"`
 	Name            string         `json:"name"`
 	NodeAffinity    []AffinityTerm `json:"node_affinity"`

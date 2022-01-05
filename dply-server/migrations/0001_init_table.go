@@ -51,11 +51,37 @@ func (m *migration_0001) Down() error {
 	if err != nil {
 		return err
 	}
+	err = m.db.Exec(`DROP TABLE IF EXISTS project;`).Error
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *migration_0001) Up() error {
 	err := m.db.Exec(`
+	CREATE TABLE project (
+		id INT NOT NULL AUTO_INCREMENT,
+		name VARCHAR(128) NOT NULL UNIQUE DEFAULT 'default',
+		description TEXT NOT NULL,
+		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		PRIMARY KEY ( id )
+	);
+	`).Error
+	if err != nil {
+		return err
+	}
+
+	err = m.db.Exec(`
+	INSERT INTO project (name, description) values ('default', '');
+	`).Error
+	if err != nil {
+		return err
+	}
+
+	err = m.db.Exec(`
 	CREATE TABLE user (
 		id INT NOT NULL AUTO_INCREMENT,
 		email VARCHAR(128) NOT NULL UNIQUE,
@@ -76,6 +102,7 @@ func (m *migration_0001) Up() error {
 	err = m.db.Exec(`
 	CREATE TABLE envar (
 		id INT NOT NULL AUTO_INCREMENT,
+		project VARCHAR(128) NOT NULL DEFAULT 'default',
 		env VARCHAR(255) NOT NULL,
 		name VARCHAR(255) NOT NULL,
 		variables JSON NOT NULL,
@@ -83,7 +110,7 @@ func (m *migration_0001) Up() error {
 		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY ( id ),
-		UNIQUE(env, name)
+		UNIQUE(project, env, name)
 	);
 	`).Error
 	if err != nil {
@@ -93,6 +120,7 @@ func (m *migration_0001) Up() error {
 	err = m.db.Exec(`
 	CREATE TABLE scale (
 		id INT NOT NULL AUTO_INCREMENT,
+		project VARCHAR(128) NOT NULL DEFAULT 'default',
 		env VARCHAR(255) NOT NULL,
 		name VARCHAR(255) NOT NULL,
 	
@@ -108,7 +136,7 @@ func (m *migration_0001) Up() error {
 		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY ( id ),
-		UNIQUE(env, name)
+		UNIQUE(project, env, name)
 	);
 	`).Error
 	if err != nil {
@@ -118,6 +146,7 @@ func (m *migration_0001) Up() error {
 	err = m.db.Exec(`
 	CREATE TABLE port (
 		id INT NOT NULL AUTO_INCREMENT,
+		project VARCHAR(128) NOT NULL DEFAULT 'default',
 		env VARCHAR(255) NOT NULL,
 		name VARCHAR(255) NOT NULL,
 		ports JSON NOT NULL,
@@ -125,7 +154,7 @@ func (m *migration_0001) Up() error {
 		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY ( id ),
-		UNIQUE(env, name)
+		UNIQUE(project, env, name)
 	);
 	`).Error
 	if err != nil {
@@ -156,6 +185,7 @@ func (m *migration_0001) Up() error {
 	err = m.db.Exec(`
 	CREATE TABLE affinity (
 		id INT NOT NULL AUTO_INCREMENT,
+		project VARCHAR(128) NOT NULL DEFAULT 'default',
 		env VARCHAR(255) NOT NULL,
 		name VARCHAR(255) NOT NULL,
 		affinity JSON NOT NULL,
@@ -163,7 +193,7 @@ func (m *migration_0001) Up() error {
 		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY ( id ),
-		UNIQUE(env, name)
+		UNIQUE(project, env, name)
 	);
 	`).Error
 	if err != nil {
@@ -196,6 +226,7 @@ func (m *migration_0001) Up() error {
 		id INT NOT NULL AUTO_INCREMENT,
 		digest VARCHAR(32) NOT NULL UNIQUE,
 		image VARCHAR(255) NOT NULL UNIQUE,
+		project VARCHAR(128) NOT NULL DEFAULT 'default',
 		repository VARCHAR(128) NOT NULL,
 		description TEXT NOT NULL,
 		created_by INT NOT NULL,
@@ -208,7 +239,7 @@ func (m *migration_0001) Up() error {
 		return err
 	}
 
-	err = m.db.Exec(`CREATE INDEX image_repository_created_at ON image (repository, created_at);`).Error
+	err = m.db.Exec(`CREATE INDEX image_project_repository_created_at ON image (project, repository, created_at);`).Error
 	if err != nil {
 		return err
 	}
@@ -216,6 +247,7 @@ func (m *migration_0001) Up() error {
 	err = m.db.Exec(`
 	CREATE TABLE deployment (
 		id INT NOT NULL AUTO_INCREMENT,
+		project VARCHAR(128) NOT NULL DEFAULT 'default',
 		env VARCHAR(255) NOT NULL,
 		name VARCHAR(255) NOT NULL,
 		image_digest VARCHAR(32) NOT NULL,
@@ -231,7 +263,7 @@ func (m *migration_0001) Up() error {
 		return err
 	}
 
-	err = m.db.Exec(`CREATE INDEX deployment_env_name_created_at ON deployment (env, name, created_at);`).Error
+	err = m.db.Exec(`CREATE INDEX deployment_project_env_name_created_at ON deployment (project, env, name, created_at);`).Error
 	if err != nil {
 		return err
 	}

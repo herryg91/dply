@@ -16,7 +16,7 @@ func New(repo repository.ImageRepository) UseCase {
 	return &usecase{repo: repo}
 }
 
-func (uc *usecase) Get(repositoryName string, page, size int) ([]entity.Image, error) {
+func (uc *usecase) Get(project, repositoryName string, page, size int) ([]entity.Image, error) {
 	if size <= 0 {
 		size = 10
 	}
@@ -27,7 +27,7 @@ func (uc *usecase) Get(repositoryName string, page, size int) ([]entity.Image, e
 	limit := size
 	offset := (page - 1) * size
 
-	resp, err := uc.repo.Search(repositoryName, limit, offset, true)
+	resp, err := uc.repo.Search(project, repositoryName, limit, offset, true)
 	if err != nil {
 		return []entity.Image{}, fmt.Errorf("%w: %v", ErrUnexpected, err)
 	}
@@ -38,13 +38,13 @@ var ErrInvalidImageFormat = errors.New("invalid image format. valid format: <rep
 var ErrImageAlreadyExist = errors.New("image is already exist")
 var ErrDigestAlreadyExist = errors.New("digest is already exist, potential race condition. please retry")
 
-func (uc *usecase) Add(repositoryName, fullImage, description string, createdBy int) error {
+func (uc *usecase) Add(project, repositoryName, fullImage, description string, createdBy int) error {
 	fullDigest, err := uc.imageToDigest(fullImage)
 	if err != nil {
 		return ErrInvalidImageFormat
 	}
 
-	shortDigest, err := uc.generateShortDigest(repositoryName, fullDigest)
+	shortDigest, err := uc.generateShortDigest(fullDigest)
 	if err != nil {
 		return fmt.Errorf("%w: %v", ErrUnexpected, err)
 	}
@@ -61,6 +61,7 @@ func (uc *usecase) Add(repositoryName, fullImage, description string, createdBy 
 
 	// Write to db
 	err = uc.repo.Create(entity.Image{
+		Project:     project,
 		Digest:      shortDigest,
 		Image:       fullImage,
 		Repository:  repositoryName,

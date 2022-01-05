@@ -21,14 +21,14 @@ func New(db *gorm.DB) repository_intf.ImageRepository {
 	return &repository{db, "image"}
 }
 
-func (r *repository) Search(repositoryName string, limit, offset int, createdAtDesc bool) ([]entity.Image, error) {
+func (r *repository) Search(project, repositoryName string, limit, offset int, createdAtDesc bool) ([]entity.Image, error) {
 	resp := []entity.Image{}
 	orderByStr := "DESC"
 	if !createdAtDesc {
 		orderByStr = "ASC"
 	}
 
-	err := r.db.Table(r.table).Where("repository = ?", repositoryName).
+	err := r.db.Table(r.table).Where("project = ? AND repository = ?", project, repositoryName).
 		Limit(limit).Offset(offset).
 		Order("created_at " + orderByStr).
 		Find(&resp).Error

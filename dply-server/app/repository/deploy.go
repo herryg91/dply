@@ -9,6 +9,6 @@ import (
 var ErrDeploymentNotFound = errors.New("Current deployment not found")
 
 type DeploymentRepository interface {
-	Get(env, name string) (*entity.Deployment, error)
+	Get(project, env, name string) (*entity.Deployment, error)
 	Create(in entity.Deployment) error
 }

@@ -16,7 +16,7 @@ func (h *specConfig) GetPort(ctx context.Context, req *pbSpec.GetPortReq) (*pbSp
 	if err := pbSpec.ValidateRequest(req); err != nil {
 		return nil, err
 	}
-	resp, err := h.port_uc.Get(req.Env, req.Name)
+	resp, err := h.port_uc.Get(req.Project, req.Env, req.Name)
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 13001, err.Error())
 	}
@@ -62,6 +62,7 @@ func (h *specConfig) UpsertPort(ctx context.Context, req *pbSpec.UpsertPortReq) 
 	}
 
 	err := h.port_uc.Upsert(entity.Port{
+		Project:    req.Project,
 		Env:        req.Env,
 		Name:       req.Name,
 		AccessType: entity.AccessType(req.AccessType),

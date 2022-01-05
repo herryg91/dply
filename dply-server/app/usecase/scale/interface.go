@@ -9,6 +9,6 @@ import (
 var ErrUnexpected = errors.New("Unexpected internal error")
 
 type UseCase interface {
-	Get(env string, name string) (*entity.Scale, error)
+	Get(project, env, name string) (*entity.Scale, error)
 	Upsert(data entity.Scale) error
 }

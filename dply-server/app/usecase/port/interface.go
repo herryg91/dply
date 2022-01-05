@@ -9,7 +9,7 @@ import (
 var ErrUnexpected = errors.New("Unexpected internal error")
 
 type UseCase interface {
-	Get(env string, name string) (*entity.Port, error)
+	Get(project, env, name string) (*entity.Port, error)
 	Upsert(data entity.Port) error
 	GetTemplate(templateName string) (*entity.PortTemplate, error)
 	UpsertTemplate(data entity.PortTemplate) error

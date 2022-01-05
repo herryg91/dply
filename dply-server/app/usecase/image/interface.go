@@ -10,8 +10,8 @@ var ErrUnexpected = errors.New("Unexpected internal error")
 var ErrImageNotFound = errors.New("Image not found")
 
 type UseCase interface {
-	Get(repository string, page, size int) ([]entity.Image, error)
-	Add(repository, fullImage, description string, createdBy int) error
+	Get(project, repository string, page, size int) ([]entity.Image, error)
+	Add(project, repository, fullImage, description string, createdBy int) error
 	Remove(digest string) error
 	GetByDigest(digest string) (*entity.Image, error)
 }

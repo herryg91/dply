@@ -9,7 +9,7 @@ import (
 var ErrUnexpected = errors.New("Unexpected internal error")
 
 type UseCase interface {
-	Get(env string, name string) (*entity.Affinity, error)
+	Get(project, env, name string) (*entity.Affinity, error)
 	Upsert(data entity.Affinity) error
 	GetTemplate(templateName string) (*entity.AffinityTemplate, error)
 	UpsertTemplate(data entity.AffinityTemplate) error

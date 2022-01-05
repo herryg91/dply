@@ -1,6 +1,7 @@
 package entity
 
 type Envar struct {
+	Project   string                 `json:"project"`
 	Env       string                 `json:"env"`
 	Name      string                 `json:"name"`
 	Variables map[string]interface{} `json:"variables"`

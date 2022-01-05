@@ -21,9 +21,9 @@ func New(db *gorm.DB) repository_intf.AffinityRepository {
 	return &repository{db, "affinity", "affinity_template"}
 }
 
-func (r *repository) Get(env, name string) (*entity.Affinity, error) {
+func (r *repository) Get(project, env, name string) (*entity.Affinity, error) {
 	affinityModel := &AffinityModel{}
-	err := r.db.Table(r.table_affinity).Where("env = ? AND name = ?", env, name).First(&affinityModel).Error
+	err := r.db.Table(r.table_affinity).Where("project = ? AND env = ? AND name = ?", project, env, name).First(&affinityModel).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, repository_intf.ErrAffinityNotFound

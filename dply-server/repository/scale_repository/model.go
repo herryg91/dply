@@ -8,6 +8,7 @@ import (
 
 type ScaleModel struct {
 	Id                   int        `gorm:"column:id"`
+	Project              string     `gorm:"column:project"`
 	Env                  string     `gorm:"column:env"`
 	Name                 string     `gorm:"column:name"`
 	MinReplica           int        `gorm:"column:min_replica"`
@@ -27,6 +28,7 @@ func (sm *ScaleModel) ToScaleEntity() *entity.Scale {
 		return nil
 	}
 	return &entity.Scale{
+		Project:              sm.Project,
 		Env:                  sm.Env,
 		Name:                 sm.Name,
 		MinReplica:           sm.MinReplica,
@@ -42,6 +44,7 @@ func (sm *ScaleModel) ToScaleEntity() *entity.Scale {
 
 func (ScaleModel) FromScaleEntity(s entity.Scale) *ScaleModel {
 	return &ScaleModel{
+		Project:              s.Project,
 		Env:                  s.Env,
 		Name:                 s.Name,
 		MinReplica:           s.MinReplica,

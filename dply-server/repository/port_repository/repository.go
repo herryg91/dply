@@ -21,9 +21,9 @@ func New(db *gorm.DB) repository_intf.PortRepository {
 	return &repository{db, "port", "port_template"}
 }
 
-func (r *repository) Get(env, name string) (*entity.Port, error) {
+func (r *repository) Get(project, env, name string) (*entity.Port, error) {
 	portModel := &PortModel{}
-	err := r.db.Table(r.table_port).Where("env = ? AND name = ?", env, name).First(&portModel).Error
+	err := r.db.Table(r.table_port).Where("project = ? AND env = ? AND name = ?", project, env, name).First(&portModel).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, repository_intf.ErrPortNotFound

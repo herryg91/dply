@@ -17,7 +17,8 @@ func (h *specConfig) GetEnvar(ctx context.Context, req *pbSpec.GetEnvarReq) (*pb
 	if err := pbSpec.ValidateRequest(req); err != nil {
 		return nil, err
 	}
-	resp, err := h.envar_uc.Get(req.Env, req.Name)
+
+	resp, err := h.envar_uc.Get(req.Project, req.Env, req.Name)
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 11001, err.Error())
 	}
@@ -38,6 +39,7 @@ func (h *specConfig) UpsertEnvar(ctx context.Context, req *pbSpec.UpsertEnvarReq
 	variables := map[string]interface{}{}
 	json.Unmarshal([]byte(req.Variables), &variables)
 	err := h.envar_uc.Upsert(entity.Envar{
+		Project:   req.Project,
 		Env:       req.Env,
 		Name:      req.Name,
 		Variables: variables,

@@ -16,12 +16,13 @@ func (h *specConfig) GetScale(ctx context.Context, req *pbSpec.GetScaleReq) (*pb
 	if err := pbSpec.ValidateRequest(req); err != nil {
 		return nil, err
 	}
-	resp, err := h.scale_uc.Get(req.Env, req.Name)
+	resp, err := h.scale_uc.Get(req.Project, req.Env, req.Name)
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 12001, err.Error())
 	}
 
 	return &pbSpec.Scale{
+		Project:              resp.Project,
 		Env:                  resp.Env,
 		Name:                 resp.Name,
 		MinReplica:           int32(resp.MinReplica),
@@ -41,6 +42,7 @@ func (h *specConfig) UpsertScale(ctx context.Context, req *pbSpec.UpsertScaleReq
 	userCtx := interceptor.ExtractMustLoginContext(ctx)
 
 	err := h.scale_uc.Upsert(entity.Scale{
+		Project:              req.Project,
 		Env:                  req.Env,
 		Name:                 req.Name,
 		MinReplica:           int(req.MinReplica),

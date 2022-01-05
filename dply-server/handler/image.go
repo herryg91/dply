@@ -26,7 +26,7 @@ func (h *handlerImage) Get(ctx context.Context, req *pbImage.GetReq) (*pbImage.I
 		return nil, err
 	}
 
-	datas, err := h.image_uc.Get(req.Repository, int(req.Page), int(req.Size))
+	datas, err := h.image_uc.Get(req.Project, req.Repository, int(req.Page), int(req.Size))
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 10000, err.Error())
 	}
@@ -38,6 +38,7 @@ func (h *handlerImage) Get(ctx context.Context, req *pbImage.GetReq) (*pbImage.I
 			Id:          int32(data.Id),
 			Digest:      data.Digest,
 			Image:       data.Image,
+			Project:     data.Project,
 			Repository:  data.Repository,
 			Description: data.Description,
 			CreatedBy:   int32(data.CreatedBy),
@@ -53,7 +54,7 @@ func (h *handlerImage) Add(ctx context.Context, req *pbImage.AddReq) (*empty.Emp
 	}
 
 	userCtx := interceptor.ExtractMustLoginContext(ctx)
-	err := h.image_uc.Add(req.Repository, req.Image, req.Description, userCtx.Id)
+	err := h.image_uc.Add(req.Project, req.Repository, req.Image, req.Description, userCtx.Id)
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 11000, err.Error())
 	}

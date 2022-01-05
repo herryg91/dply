@@ -7,6 +7,6 @@ import (
 var ErrUnexpected = errors.New("Unexpected internal error")
 
 type UseCase interface {
-	DeployImage(env string, name string, digest string, createdBy int) error
-	Redeploy(env string, serviceName string, createdBy int) error
+	DeployImage(project string, env string, name string, digest string, createdBy int) error
+	Redeploy(project string, env string, serviceName string, createdBy int) error
 }

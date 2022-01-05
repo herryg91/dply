@@ -28,7 +28,7 @@ func (h *handlerDeploy) DeployImage(ctx context.Context, req *pbDeploy.DeployIma
 
 	userCtx := interceptor.ExtractMustLoginContext(ctx)
 
-	err := h.deploy_uc.DeployImage(req.Env, req.Name, req.Digest, userCtx.Id)
+	err := h.deploy_uc.DeployImage(req.Project, req.Env, req.Name, req.Digest, userCtx.Id)
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 11001, err.Error())
 	}
@@ -38,7 +38,7 @@ func (h *handlerDeploy) DeployImage(ctx context.Context, req *pbDeploy.DeployIma
 func (h *handlerDeploy) Redeploy(ctx context.Context, req *pbDeploy.RedeployReq) (*empty.Empty, error) {
 	userCtx := interceptor.ExtractMustLoginContext(ctx)
 
-	err := h.deploy_uc.Redeploy(req.Env, req.Name, userCtx.Id)
+	err := h.deploy_uc.Redeploy(req.Project, req.Env, req.Name, userCtx.Id)
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 12001, err.Error())
 	}

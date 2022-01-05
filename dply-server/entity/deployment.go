@@ -7,6 +7,7 @@ import (
 
 type Deployment struct {
 	Id              int      `json:"id"`
+	Project         string   `json:"project"`
 	Env             string   `json:"env"`
 	Name            string   `json:"name"`
 	DeploymentImage Image    `json:"image_detail"`

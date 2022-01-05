@@ -17,11 +17,11 @@ func New(scale_repo repository.ScaleRepository) UseCase {
 	return &usecase{scale_repo: scale_repo}
 }
 
-func (uc *usecase) Get(env string, name string) (*entity.Scale, error) {
-	resp, err := uc.scale_repo.Get(env, name)
+func (uc *usecase) Get(project, env, name string) (*entity.Scale, error) {
+	resp, err := uc.scale_repo.Get(project, env, name)
 	if err != nil {
 		if errors.Is(err, repository.ErrScaleNotFound) {
-			return entity.Scale{}.DefaultScale(env, name), nil
+			return entity.Scale{}.DefaultScale(project, env, name), nil
 		}
 		return nil, fmt.Errorf("%w: %v", ErrUnexpected, err.Error())
 	}

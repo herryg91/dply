@@ -24,12 +24,14 @@ service DeployApi {
 }
 
 message DeployImageReq {
+    string Project = 4 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
     string Digest = 3 [json_name="digest", (cdd.api.validate) = "required"];
 }
 
 message RedeployReq {
+    string Project = 3 [json_name="project", (cdd.api.default) = "default"];
     string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
     string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
 }

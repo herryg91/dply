@@ -43,33 +43,34 @@ func New(
 	}
 }
 
-func (uc *usecase) DeployImage(env string, name string, digest string, createdBy int) error {
+func (uc *usecase) DeployImage(project string, env string, name string, digest string, createdBy int) error {
 	currentImage, err := uc.image_uc.GetByDigest(digest)
 	if err != nil {
 		return fmt.Errorf("%w: %v", ErrUnexpected, err.Error())
 	}
 
-	currentEnvar, _ := uc.envar_uc.Get(env, name)
+	currentEnvar, _ := uc.envar_uc.Get(project, env, name)
 	if currentEnvar == nil {
 		currentEnvar = entity.Envar{}.DefaultEnvar(env, name)
 	}
 
-	currentScale, _ := uc.scale_uc.Get(env, name)
+	currentScale, _ := uc.scale_uc.Get(project, env, name)
 	if currentScale == nil {
-		currentScale = entity.Scale{}.DefaultScale(env, name)
+		currentScale = entity.Scale{}.DefaultScale(project, env, name)
 	}
 
-	currentPort, _ := uc.port_uc.Get(env, name)
+	currentPort, _ := uc.port_uc.Get(project, env, name)
 	if currentPort == nil {
 		currentPort = entity.Port{}.DefaultPort(env, name)
 	}
 
-	currentAffinity, _ := uc.affinity_uc.Get(env, name)
+	currentAffinity, _ := uc.affinity_uc.Get(project, env, name)
 	if currentAffinity == nil {
 		currentAffinity = entity.Affinity{}.DefaultAffinity(env, name)
 	}
 
 	newDeployment := entity.Deployment{
+		Project:         project,
 		Env:             env,
 		Name:            name,
 		DeploymentImage: *currentImage,
@@ -82,7 +83,7 @@ func (uc *usecase) DeployImage(env string, name string, digest string, createdBy
 
 	// Check if redeploy or new deployment
 	deployAction := "new" // choice: new|redeploy
-	currentDeployment, err := uc.deploy_repo.Get(env, name)
+	currentDeployment, err := uc.deploy_repo.Get(project, env, name)
 	if err != nil {
 		if !errors.Is(err, repository.ErrDeploymentNotFound) {
 			return fmt.Errorf("%w: %v", ErrUnexpected, err.Error())
@@ -121,13 +122,13 @@ func (uc *usecase) DeployImage(env string, name string, digest string, createdBy
 	return nil
 }
 
-func (uc *usecase) Redeploy(env string, serviceName string, createdBy int) error {
-	currentDeploy, err := uc.deploy_repo.Get(env, serviceName)
+func (uc *usecase) Redeploy(project string, env string, serviceName string, createdBy int) error {
+	currentDeploy, err := uc.deploy_repo.Get(project, env, serviceName)
 	if err != nil {
 		if errors.Is(err, repository.ErrDeploymentNotFound) {
 			return fmt.Errorf("%w: %v", ErrUnexpected, "No deployment, cannot redeploy")
 		}
 		return fmt.Errorf("%w: %v", ErrUnexpected, err.Error())
 	}
-	return uc.DeployImage(env, serviceName, currentDeploy.DeploymentImage.Digest, createdBy)
+	return uc.DeployImage(project, env, serviceName, currentDeploy.DeploymentImage.Digest, createdBy)
 }

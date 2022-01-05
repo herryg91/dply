@@ -10,6 +10,7 @@ type ImageModel struct {
 	Id          int    `gorm:"column:id"`
 	Digest      string `gorm:"column:digest"`
 	Image       string `gorm:"column:image"`
+	Project     string `gorm:"column:project"`
 	Repository  string `gorm:"column:repository"`
 	Description string `gorm:"column:description"`
 	CreatedBy   int    `gorm:"column:created_by"`
@@ -26,6 +27,7 @@ func (im *ImageModel) ToImageEntity() *entity.Image {
 		Id:          im.Id,
 		Digest:      im.Digest,
 		Image:       im.Image,
+		Project:     im.Project,
 		Repository:  im.Repository,
 		Description: im.Description,
 		CreatedBy:   im.CreatedBy,
@@ -38,6 +40,7 @@ func (ImageModel) FromImageEntity(i entity.Image) *ImageModel {
 		Id:          i.Id,
 		Digest:      i.Digest,
 		Image:       i.Image,
+		Project:     i.Project,
 		Repository:  i.Repository,
 		Description: i.Description,
 		CreatedBy:   i.CreatedBy,

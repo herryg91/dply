@@ -9,6 +9,7 @@ import (
 
 type EnvarModel struct {
 	Id        int        `gorm:"column:id"`
+	Project   string     `gorm:"column:project"`
 	Env       string     `gorm:"column:env"`
 	Name      string     `gorm:"column:name"`
 	Variables []byte     `gorm:"column:variables"`
@@ -25,6 +26,7 @@ func (em *EnvarModel) ToEnvarEntity() *entity.Envar {
 	variables := map[string]interface{}{}
 	json.Unmarshal(em.Variables, &variables)
 	return &entity.Envar{
+		Project:   em.Project,
 		Env:       em.Env,
 		Name:      em.Name,
 		Variables: variables,
@@ -35,6 +37,7 @@ func (em *EnvarModel) ToEnvarEntity() *entity.Envar {
 func (EnvarModel) FromEnvarEntity(e entity.Envar) *EnvarModel {
 	variables, _ := json.Marshal(&e.Variables)
 	return &EnvarModel{
+		Project:   e.Project,
 		Env:       e.Env,
 		Name:      e.Name,
 		Variables: variables,

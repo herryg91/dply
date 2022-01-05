@@ -33,6 +33,7 @@ message Image {
     int32 Id = 1 [json_name="id"];
     string Digest = 2 [json_name="digest"];
     string Image = 4 [json_name="image"];
+    string Project = 9 [json_name="project", (cdd.api.default) = "default"];
     string Repository = 5 [json_name="repository"];
     string Description = 6 [json_name="description"];
     int32 CreatedBy = 7 [json_name="created_by"];
@@ -44,18 +45,21 @@ message Images {
 }
 
 message GetReq {
+    string Project = 4 [json_name="project", (cdd.api.default) = "default"];
     string Repository = 1 [json_name="repository", (cdd.api.validate) = "required"];
     int32 Size = 2 [json_name="size"];
     int32 Page = 3 [json_name="page"];
 }
 
 message AddReq {
+    string Project = 4 [json_name="project", (cdd.api.default) = "default"];
     string Image = 1 [json_name="image", (cdd.api.validate) = "required"];
     string Repository = 2 [json_name="repository", (cdd.api.validate) = "required"];
     string Description = 3 [json_name="description"];
 }
 
 message RemoveReq {
+    string Project = 3 [json_name="project", (cdd.api.default) = "default"];
     string Repository = 1 [json_name="repository", (cdd.api.validate) = "required"];
     string Digest = 2 [json_name="digest", (cdd.api.validate) = "required"];
 }

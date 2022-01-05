@@ -76,8 +76,8 @@ type UnsafeImageApiServer interface {
 	mustEmbedUnimplementedImageApiServer()
 }
 
-func RegisterImageApiServer(s *grpc.Server, srv ImageApiServer) {
-	s.RegisterService(&_ImageApi_serviceDesc, srv)
+func RegisterImageApiServer(s grpc.ServiceRegistrar, srv ImageApiServer) {
+	s.RegisterService(&ImageApi_ServiceDesc, srv)
 }
 
 func _ImageApi_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -116,7 +116,10 @@ func _ImageApi_Add_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-var _ImageApi_serviceDesc = grpc.ServiceDesc{
+// ImageApi_ServiceDesc is the grpc.ServiceDesc for ImageApi service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ImageApi_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "image.ImageApi",
 	HandlerType: (*ImageApiServer)(nil),
 	Methods: []grpc.MethodDesc{

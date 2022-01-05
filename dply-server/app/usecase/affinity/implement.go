@@ -18,8 +18,8 @@ func New(affinity_repo repository.AffinityRepository) UseCase {
 	return &usecase{affinity_repo: affinity_repo}
 }
 
-func (uc *usecase) Get(env string, name string) (*entity.Affinity, error) {
-	resp, err := uc.affinity_repo.Get(env, name)
+func (uc *usecase) Get(project, env, name string) (*entity.Affinity, error) {
+	resp, err := uc.affinity_repo.Get(project, env, name)
 	useDefault := false
 	if err != nil {
 		if errors.Is(err, repository.ErrAffinityNotFound) {

@@ -17,8 +17,8 @@ func New(port_repo repository.PortRepository) UseCase {
 	return &usecase{port_repo: port_repo}
 }
 
-func (uc *usecase) Get(env string, name string) (*entity.Port, error) {
-	resp, err := uc.port_repo.Get(env, name)
+func (uc *usecase) Get(project, env, name string) (*entity.Port, error) {
+	resp, err := uc.port_repo.Get(project, env, name)
 	useDefault := false
 	if err != nil {
 		if errors.Is(err, repository.ErrPortNotFound) {
