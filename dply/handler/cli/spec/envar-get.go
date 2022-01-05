@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	envar_usecase "github.com/herryg91/dply/dply/app/usecase/envar"
+	"github.com/herryg91/dply/dply/entity"
 	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -15,12 +16,13 @@ type CmdSpecEnvarGet struct {
 	*cobra.Command
 	envar_uc envar_usecase.UseCase
 
-	env  string
-	name string
+	project string
+	env     string
+	name    string
 }
 
-func newSpecEnvarGet(envar_uc envar_usecase.UseCase) *CmdSpecEnvarGet {
-	c := &CmdSpecEnvarGet{envar_uc: envar_uc}
+func newSpecEnvarGet(cfg *entity.Config, envar_uc envar_usecase.UseCase) *CmdSpecEnvarGet {
+	c := &CmdSpecEnvarGet{project: cfg.Project, envar_uc: envar_uc}
 	c.Command = &cobra.Command{
 		Use:     "envar-get",
 		Aliases: []string{"eg"},
@@ -46,7 +48,7 @@ func (c *CmdSpecEnvarGet) runCommand(cmd *cobra.Command, args []string) error {
 		c.name = data.Name
 	}
 
-	resp, err := c.envar_uc.Get(c.env, c.name)
+	resp, err := c.envar_uc.Get(c.project, c.env, c.name)
 	if err != nil {
 		if errors.Is(err, envar_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

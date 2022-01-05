@@ -21,7 +21,7 @@ func New(cli pbDeploy.DeployApiClient) repository_intf.DeployRepository {
 	return &repository{cli}
 }
 
-func (r *repository) Deploy(env, name, digest string) error {
+func (r *repository) Deploy(project, env, name, digest string) error {
 	u := entity.User{}.FromFile()
 	if u == nil {
 		return fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, "You are not login")
@@ -29,7 +29,7 @@ func (r *repository) Deploy(env, name, digest string) error {
 
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
-	_, err := r.cli.DeployImage(ctx, &pbDeploy.DeployImageReq{Env: env, Name: name, Digest: digest})
+	_, err := r.cli.DeployImage(ctx, &pbDeploy.DeployImageReq{Project: project, Env: env, Name: name, Digest: digest})
 	if err != nil {
 		grsterr, errparse := grst_errors.NewFromError(err)
 		if errparse != nil {
@@ -43,7 +43,7 @@ func (r *repository) Deploy(env, name, digest string) error {
 	return nil
 }
 
-func (r *repository) Redeploy(env, name string) error {
+func (r *repository) Redeploy(project, env, name string) error {
 	u := entity.User{}.FromFile()
 	if u == nil {
 		return fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, "You are not login")
@@ -51,7 +51,7 @@ func (r *repository) Redeploy(env, name string) error {
 
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
-	_, err := r.cli.Redeploy(ctx, &pbDeploy.RedeployReq{Env: env, Name: name})
+	_, err := r.cli.Redeploy(ctx, &pbDeploy.RedeployReq{Project: project, Env: env, Name: name})
 	if err != nil {
 		grsterr, errparse := grst_errors.NewFromError(err)
 		if errparse != nil {

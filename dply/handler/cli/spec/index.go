@@ -49,15 +49,15 @@ func New() *CmdSpec {
 		Long:  "Manage deployment spec: envar, port, etc.",
 	}
 
-	c.AddCommand(newSpecGet(envar_uc, port_uc, scale_uc, affinity_uc).Command)
-	c.AddCommand(newSpecScalingGet(scale_uc).Command)
-	c.AddCommand(newSpecScalingEdit(scale_uc, cfg).Command)
-	c.AddCommand(newSpecEnvarGet(envar_uc).Command)
-	c.AddCommand(newSpecEnvarEdit(envar_uc, cfg).Command)
-	c.AddCommand(newSpecPortGet(port_uc).Command)
-	c.AddCommand(newSpecPortEdit(port_uc, cfg).Command)
-	c.AddCommand(newSpecAffinityGet(affinity_uc).Command)
-	c.AddCommand(newSpecAffinityEdit(affinity_uc, cfg).Command)
+	c.AddCommand(newSpecGet(cfg, envar_uc, port_uc, scale_uc, affinity_uc).Command)
+	c.AddCommand(newSpecScalingGet(cfg, scale_uc).Command)
+	c.AddCommand(newSpecScalingEdit(cfg, scale_uc).Command)
+	c.AddCommand(newSpecEnvarGet(cfg, envar_uc).Command)
+	c.AddCommand(newSpecEnvarEdit(cfg, envar_uc).Command)
+	c.AddCommand(newSpecPortGet(cfg, port_uc).Command)
+	c.AddCommand(newSpecPortEdit(cfg, port_uc).Command)
+	c.AddCommand(newSpecAffinityGet(cfg, affinity_uc).Command)
+	c.AddCommand(newSpecAffinityEdit(cfg, affinity_uc).Command)
 
 	return c
 }

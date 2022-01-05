@@ -16,8 +16,8 @@ type usecase struct {
 func New(repo repository.ImageRepository) UseCase {
 	return &usecase{repo: repo}
 }
-func (uc *usecase) Add(repoName, image, description string) error {
-	err := uc.repo.Add(repoName, image, description)
+func (uc *usecase) Add(project, repoName, image, description string) error {
+	err := uc.repo.Add(project, repoName, image, description)
 	if err != nil {
 		if errors.Is(err, repository.ErrUnauthorized) {
 			return fmt.Errorf("%w: %v", ErrUnauthorized, "You are not login")
@@ -27,7 +27,7 @@ func (uc *usecase) Add(repoName, image, description string) error {
 	return nil
 }
 
-func (uc *usecase) Create(name, tag_prefix, description string) error {
+func (uc *usecase) Create(project, name, tag_prefix, description string) error {
 	// Preparation
 	current_folder, _ := os.Getwd()
 	if _, err := os.Stat(current_folder + "/Dockerfile"); errors.Is(err, os.ErrNotExist) {
@@ -59,7 +59,7 @@ func (uc *usecase) Create(name, tag_prefix, description string) error {
 	fmt.Println("Successfully push image, digest: ", digest)
 
 	fmt.Println("---------- 3. Add Image to Dply ----------")
-	err = uc.Add(name, repo_full_name+"@"+digest, description)
+	err = uc.Add(project, name, repo_full_name+"@"+digest, description)
 	if err != nil {
 		return err
 	}
@@ -93,8 +93,8 @@ func (uc *usecase) Remove(repoName, digest string) error {
 	}
 	return nil
 }
-func (uc *usecase) GetList(repoName string, page, size int) ([]entity.ContainerImage, error) {
-	resp, err := uc.repo.Get(repoName, page, size)
+func (uc *usecase) GetList(project, repoName string, page, size int) ([]entity.ContainerImage, error) {
+	resp, err := uc.repo.Get(project, repoName, page, size)
 	if err != nil {
 		if errors.Is(err, repository.ErrUnauthorized) {
 			return []entity.ContainerImage{}, fmt.Errorf("%w: %v", ErrUnauthorized, "You are not login")

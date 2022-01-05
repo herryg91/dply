@@ -7,6 +7,7 @@ import (
 	"time"
 
 	image_usecase "github.com/herryg91/dply/dply/app/usecase/image"
+	"github.com/herryg91/dply/dply/entity"
 	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 	"github.com/olekukonko/tablewriter"
 	"github.com/sirupsen/logrus"
@@ -17,13 +18,14 @@ type CmdImageList struct {
 	*cobra.Command
 	image_uc image_usecase.UseCase
 
-	name string
-	page int
-	size int
+	project string
+	name    string
+	page    int
+	size    int
 }
 
-func newCmdImageList(image_uc image_usecase.UseCase) *CmdImageList {
-	c := &CmdImageList{image_uc: image_uc}
+func newCmdImageList(cfg *entity.Config, image_uc image_usecase.UseCase) *CmdImageList {
+	c := &CmdImageList{project: cfg.Project, image_uc: image_uc}
 	c.Command = &cobra.Command{
 		Use:   "list",
 		Short: "Get container images",
@@ -47,7 +49,7 @@ func (c *CmdImageList) runCommand(cmd *cobra.Command, args []string) error {
 		c.name = data.Name
 	}
 
-	datas, err := c.image_uc.GetList(c.name, c.page, c.size)
+	datas, err := c.image_uc.GetList(c.project, c.name, c.page, c.size)
 	if err != nil {
 		if errors.Is(err, image_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

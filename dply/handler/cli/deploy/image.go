@@ -5,20 +5,23 @@ import (
 	"fmt"
 
 	deploy_usecase "github.com/herryg91/dply/dply/app/usecase/deploy"
+	"github.com/herryg91/dply/dply/entity"
 	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 	"github.com/spf13/cobra"
 )
 
 type CmdDeployImage struct {
 	*cobra.Command
-
 	deploy_uc deploy_usecase.UseCase
-	env       string
-	name      string
+
+	project string
+	env     string
+	name    string
 }
 
-func newDeployImage(deploy_uc deploy_usecase.UseCase) *CmdDeployImage {
+func newDeployImage(cfg *entity.Config, deploy_uc deploy_usecase.UseCase) *CmdDeployImage {
 	c := &CmdDeployImage{
+		project:   cfg.Project,
 		deploy_uc: deploy_uc,
 	}
 	c.Command = &cobra.Command{
@@ -48,7 +51,7 @@ func (c *CmdDeployImage) runCommand(cmd *cobra.Command, args []string) error {
 	}
 	digest := args[0]
 
-	err := c.deploy_uc.Deploy(c.env, c.name, digest)
+	err := c.deploy_uc.Deploy(c.project, c.env, c.name, digest)
 	if err != nil {
 		return err
 	}

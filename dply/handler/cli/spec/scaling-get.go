@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	scale_usecase "github.com/herryg91/dply/dply/app/usecase/scale"
+	"github.com/herryg91/dply/dply/entity"
 	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -15,12 +16,13 @@ type CmdSpecScalingGet struct {
 	*cobra.Command
 	scale_uc scale_usecase.UseCase
 
-	env  string
-	name string
+	project string
+	env     string
+	name    string
 }
 
-func newSpecScalingGet(scale_uc scale_usecase.UseCase) *CmdSpecScalingGet {
-	c := &CmdSpecScalingGet{scale_uc: scale_uc}
+func newSpecScalingGet(cfg *entity.Config, scale_uc scale_usecase.UseCase) *CmdSpecScalingGet {
+	c := &CmdSpecScalingGet{project: cfg.Project, scale_uc: scale_uc}
 	c.Command = &cobra.Command{
 		Use:     "scaling-get",
 		Aliases: []string{"sg"},
@@ -46,7 +48,7 @@ func (c *CmdSpecScalingGet) runCommand(cmd *cobra.Command, args []string) error 
 		c.name = data.Name
 	}
 
-	resp, err := c.scale_uc.Get(c.env, c.name)
+	resp, err := c.scale_uc.Get(c.project, c.env, c.name)
 	if err != nil {
 		if errors.Is(err, scale_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

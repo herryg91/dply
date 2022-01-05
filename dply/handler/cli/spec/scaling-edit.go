@@ -17,12 +17,18 @@ type CmdSpecScalingEdit struct {
 	scale_uc scale_usecase.UseCase
 	cfg      *entity.Config
 
-	env  string
-	name string
+	project string
+	env     string
+	name    string
+	editor  string
 }
 
-func newSpecScalingEdit(scale_uc scale_usecase.UseCase, cfg *entity.Config) *CmdSpecScalingEdit {
-	c := &CmdSpecScalingEdit{scale_uc: scale_uc, cfg: cfg}
+func newSpecScalingEdit(cfg *entity.Config, scale_uc scale_usecase.UseCase) *CmdSpecScalingEdit {
+	c := &CmdSpecScalingEdit{
+		project:  cfg.Project,
+		scale_uc: scale_uc, cfg: cfg,
+		editor: cfg.Editor,
+	}
 	c.Command = &cobra.Command{
 		Use:     "scaling-edit",
 		Aliases: []string{"se"},
@@ -50,7 +56,7 @@ func (c *CmdSpecScalingEdit) runCommand(cmd *cobra.Command, args []string) error
 		c.name = data.Name
 	}
 
-	ok, err := c.scale_uc.UpsertViaEditor(c.env, c.name, editor.EditorApp(c.cfg.Editor))
+	ok, err := c.scale_uc.UpsertViaEditor(c.project, c.env, c.name, editor.EditorApp(c.editor))
 	if err != nil {
 		if errors.Is(err, scale_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

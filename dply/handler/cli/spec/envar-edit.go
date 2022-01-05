@@ -15,14 +15,19 @@ import (
 type CmdSpecEnvarEdit struct {
 	*cobra.Command
 	envar_uc envar_usecase.UseCase
-	cfg      *entity.Config
 
-	env  string
-	name string
+	project string
+	env     string
+	name    string
+	editor  string
 }
 
-func newSpecEnvarEdit(envar_uc envar_usecase.UseCase, cfg *entity.Config) *CmdSpecEnvarEdit {
-	c := &CmdSpecEnvarEdit{envar_uc: envar_uc, cfg: cfg}
+func newSpecEnvarEdit(cfg *entity.Config, envar_uc envar_usecase.UseCase) *CmdSpecEnvarEdit {
+	c := &CmdSpecEnvarEdit{
+		envar_uc: envar_uc,
+		project:  cfg.Project,
+		editor:   cfg.Editor,
+	}
 	c.Command = &cobra.Command{
 		Use:     "envar-edit",
 		Aliases: []string{"ee"},
@@ -38,8 +43,6 @@ func newSpecEnvarEdit(envar_uc envar_usecase.UseCase, cfg *entity.Config) *CmdSp
 func (c *CmdSpecEnvarEdit) runCommand(cmd *cobra.Command, args []string) error {
 	if c.envar_uc == nil {
 		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
-	} else if c.cfg == nil {
-		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
 	} else if c.env == "" {
 		return errors.New("`-e` is required")
 	} else if c.name == "" {
@@ -50,7 +53,7 @@ func (c *CmdSpecEnvarEdit) runCommand(cmd *cobra.Command, args []string) error {
 		c.name = data.Name
 	}
 
-	ok, err := c.envar_uc.UpsertViaEditor(c.env, c.name, editor.EditorApp(c.cfg.Editor))
+	ok, err := c.envar_uc.UpsertViaEditor(c.project, c.env, c.name, editor.EditorApp(c.editor))
 	if err != nil {
 		if errors.Is(err, envar_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

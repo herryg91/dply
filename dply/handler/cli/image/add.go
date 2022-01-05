@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	image_usecase "github.com/herryg91/dply/dply/app/usecase/image"
+	"github.com/herryg91/dply/dply/entity"
 	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 
 	"github.com/spf13/cobra"
@@ -15,13 +16,14 @@ type CmdImageAdd struct {
 	*cobra.Command
 	image_uc image_usecase.UseCase
 
+	project     string
 	name        string
 	image       string
 	description string
 }
 
-func newCmdImageAdd(image_uc image_usecase.UseCase) *CmdImageAdd {
-	c := &CmdImageAdd{image_uc: image_uc}
+func newCmdImageAdd(cfg *entity.Config, image_uc image_usecase.UseCase) *CmdImageAdd {
+	c := &CmdImageAdd{project: cfg.Project, image_uc: image_uc}
 	c.Command = &cobra.Command{
 		Use:   "add",
 		Short: "Add container image",
@@ -52,7 +54,7 @@ func (c *CmdImageAdd) runCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	err := c.image_uc.Add(c.name, c.image, c.description)
+	err := c.image_uc.Add(c.project, c.name, c.image, c.description)
 	if err != nil {
 		return err
 	}

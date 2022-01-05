@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	affinity_usecase "github.com/herryg91/dply/dply/app/usecase/affinity"
+	"github.com/herryg91/dply/dply/entity"
 	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -15,12 +16,13 @@ type CmdSpecAffinityGet struct {
 	*cobra.Command
 	affinity_uc affinity_usecase.UseCase
 
-	env  string
-	name string
+	project string
+	env     string
+	name    string
 }
 
-func newSpecAffinityGet(affinity_uc affinity_usecase.UseCase) *CmdSpecAffinityGet {
-	c := &CmdSpecAffinityGet{affinity_uc: affinity_uc}
+func newSpecAffinityGet(cfg *entity.Config, affinity_uc affinity_usecase.UseCase) *CmdSpecAffinityGet {
+	c := &CmdSpecAffinityGet{project: cfg.Project, affinity_uc: affinity_uc}
 	c.Command = &cobra.Command{
 		Use:     "affinity-get",
 		Aliases: []string{"ag"},
@@ -46,7 +48,7 @@ func (c *CmdSpecAffinityGet) runCommand(cmd *cobra.Command, args []string) error
 		c.name = data.Name
 	}
 
-	resp, err := c.affinity_uc.Get(c.env, c.name)
+	resp, err := c.affinity_uc.Get(c.project, c.env, c.name)
 	if err != nil {
 		if errors.Is(err, affinity_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

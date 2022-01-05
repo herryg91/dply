@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	deploy_usecase "github.com/herryg91/dply/dply/app/usecase/deploy"
+	"github.com/herryg91/dply/dply/entity"
 	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 	"github.com/spf13/cobra"
 )
@@ -13,12 +14,13 @@ type CmdDeployReload struct {
 	*cobra.Command
 	deploy_uc deploy_usecase.UseCase
 
-	env  string
-	name string
+	project string
+	env     string
+	name    string
 }
 
-func newDeployReload(deploy_uc deploy_usecase.UseCase) *CmdDeployReload {
-	c := &CmdDeployReload{deploy_uc: deploy_uc}
+func newDeployReload(cfg *entity.Config, deploy_uc deploy_usecase.UseCase) *CmdDeployReload {
+	c := &CmdDeployReload{project: cfg.Project, deploy_uc: deploy_uc}
 	c.Command = &cobra.Command{
 		Use:   "reload",
 		Short: "reload deployment",
@@ -43,7 +45,7 @@ func (c *CmdDeployReload) runCommand(cmd *cobra.Command, args []string) error {
 		c.name = data.Name
 	}
 
-	err := c.deploy_uc.Redeploy(c.env, c.name)
+	err := c.deploy_uc.Redeploy(c.project, c.env, c.name)
 	if err != nil {
 		return err
 	}

@@ -66,7 +66,7 @@ func New(cli pbImage.ImageApiClient, cfg *entity.Config) (repository_intf.ImageR
 		registry_password: cfg.RegistryPassword}, nil
 }
 
-func (r *repository) Add(repoName, image, description string) error {
+func (r *repository) Add(project, repoName, image, description string) error {
 	u := entity.User{}.FromFile()
 	if u == nil {
 		return fmt.Errorf("%w: %s", repository_intf.ErrUserUnauthorized, "You are not login")
@@ -74,6 +74,7 @@ func (r *repository) Add(repoName, image, description string) error {
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
 	_, err := r.cli.Add(ctx, &pbImage.AddReq{
+		Project:     project,
 		Image:       image,
 		Repository:  repoName,
 		Description: description,
@@ -93,7 +94,7 @@ func (r *repository) Remove(repoName, digest string) error {
 	return nil
 }
 
-func (r *repository) Get(repoName string, page, size int) ([]entity.ContainerImage, error) {
+func (r *repository) Get(project, repoName string, page, size int) ([]entity.ContainerImage, error) {
 	u := entity.User{}.FromFile()
 	if u == nil {
 		return []entity.ContainerImage{}, fmt.Errorf("%w: %s", repository_intf.ErrUserUnauthorized, "You are not login")
@@ -101,6 +102,7 @@ func (r *repository) Get(repoName string, page, size int) ([]entity.ContainerIma
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
 	datas, err := r.cli.Get(ctx, &pbImage.GetReq{
+		Project:    project,
 		Repository: repoName,
 		Page:       int32(page),
 		Size:       int32(size),
@@ -124,6 +126,7 @@ func (r *repository) Get(repoName string, page, size int) ([]entity.ContainerIma
 			Id:             int(data.Id),
 			Digest:         data.Digest,
 			Image:          data.Image,
+			Project:        project,
 			RepositoryName: data.Repository,
 			Description:    data.Description,
 			CreatedBy:      int(data.CreatedBy),

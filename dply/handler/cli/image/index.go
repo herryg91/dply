@@ -40,8 +40,8 @@ func New() *CmdImage {
 		}
 		image_uc = image_usecase.New(image_repo)
 	}
-	c.AddCommand(newCmdImageAdd(image_uc).Command)
-	c.AddCommand(newCmdImageList(image_uc).Command)
-	c.AddCommand(newCmdImageCreate(image_uc).Command)
+	c.AddCommand(newCmdImageAdd(cfg, image_uc).Command)
+	c.AddCommand(newCmdImageList(cfg, image_uc).Command)
+	c.AddCommand(newCmdImageCreate(cfg, image_uc).Command)
 	return c
 }

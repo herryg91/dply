@@ -1,6 +1,7 @@
 package entity
 
 type Port struct {
+	Project    string     `json:"-"`
 	Env        string     `json:"-"`
 	Name       string     `json:"-"`
 	AccessType AccessType `json:"access_type"`

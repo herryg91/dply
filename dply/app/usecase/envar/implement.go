@@ -18,8 +18,8 @@ func New(repo repository.SpecRepository) UseCase {
 	return &usecase{repo: repo}
 }
 
-func (uc *usecase) Get(env, name string) (*entity.Envar, error) {
-	resp, err := uc.repo.GetEnvar(env, name)
+func (uc *usecase) Get(project, env, name string) (*entity.Envar, error) {
+	resp, err := uc.repo.GetEnvar(project, env, name)
 	if err != nil {
 		if errors.Is(err, repository.ErrUnauthorized) {
 			return nil, fmt.Errorf("%w: %v", ErrUnauthorized, "You are not login")
@@ -37,9 +37,9 @@ func (uc *usecase) Upsert(data entity.Envar) error {
 	return nil
 }
 
-func (uc *usecase) UpsertViaEditor(env, name string, editorApp editor.EditorApp) (bool, error) {
+func (uc *usecase) UpsertViaEditor(project, env, name string, editorApp editor.EditorApp) (bool, error) {
 	// Get Current Data
-	getResp, err := uc.Get(env, name)
+	getResp, err := uc.Get(project, env, name)
 	if err != nil {
 		return false, err
 	}

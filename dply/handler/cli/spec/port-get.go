@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	port_usecase "github.com/herryg91/dply/dply/app/usecase/port"
+	"github.com/herryg91/dply/dply/entity"
 	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -15,12 +16,13 @@ type CmdSpecPortGet struct {
 	*cobra.Command
 	port_uc port_usecase.UseCase
 
-	env  string
-	name string
+	project string
+	env     string
+	name    string
 }
 
-func newSpecPortGet(port_uc port_usecase.UseCase) *CmdSpecPortGet {
-	c := &CmdSpecPortGet{port_uc: port_uc}
+func newSpecPortGet(cfg *entity.Config, port_uc port_usecase.UseCase) *CmdSpecPortGet {
+	c := &CmdSpecPortGet{project: cfg.Project, port_uc: port_uc}
 	c.Command = &cobra.Command{
 		Use:     "port-get",
 		Aliases: []string{"pg"},
@@ -46,7 +48,7 @@ func (c *CmdSpecPortGet) runCommand(cmd *cobra.Command, args []string) error {
 		c.name = data.Name
 	}
 
-	resp, err := c.port_uc.Get(c.env, c.name)
+	resp, err := c.port_uc.Get(c.project, c.env, c.name)
 	if err != nil {
 		if errors.Is(err, port_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

@@ -11,7 +11,7 @@ var ErrUnexpected = errors.New("Unexpected internal error")
 var ErrUnauthorized = errors.New("Unauthorized action")
 
 type UseCase interface {
-	Get(env, name string) (*entity.Envar, error)
+	Get(project, env, name string) (*entity.Envar, error)
 	Upsert(data entity.Envar) error
-	UpsertViaEditor(env, name string, editorApp editor.EditorApp) (bool, error)
+	UpsertViaEditor(project, env, name string, editorApp editor.EditorApp) (bool, error)
 }

@@ -38,7 +38,7 @@ func New() *CmdDeploy {
 		Long:  "Manage deployment",
 	}
 
-	c.AddCommand(newDeployImage(deploy_uc).Command)
-	c.AddCommand(newDeployReload(deploy_uc).Command)
+	c.AddCommand(newDeployImage(cfg, deploy_uc).Command)
+	c.AddCommand(newDeployReload(cfg, deploy_uc).Command)
 	return c
 }

@@ -22,7 +22,7 @@ type repository struct {
 func New(cli pbSpec.SpecApiClient) repository_intf.SpecRepository {
 	return &repository{cli}
 }
-func (r *repository) GetEnvar(env, name string) (*entity.Envar, error) {
+func (r *repository) GetEnvar(project, env, name string) (*entity.Envar, error) {
 	u := entity.User{}.FromFile()
 	if u == nil {
 		return nil, fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, "You are not login")
@@ -30,7 +30,7 @@ func (r *repository) GetEnvar(env, name string) (*entity.Envar, error) {
 
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
-	resp, err := r.cli.GetEnvar(ctx, &pbSpec.GetEnvarReq{Env: env, Name: name})
+	resp, err := r.cli.GetEnvar(ctx, &pbSpec.GetEnvarReq{Project: project, Env: env, Name: name})
 	if err != nil {
 		grsterr, errparse := grst_errors.NewFromError(err)
 		if errparse != nil {
@@ -42,7 +42,7 @@ func (r *repository) GetEnvar(env, name string) (*entity.Envar, error) {
 		return nil, errors.New(grsterr.Message + ". " + fmt.Sprintf("%v", grsterr.OtherErrors))
 	}
 
-	envar := &entity.Envar{Env: env, Name: name, Variables: map[string]interface{}{}}
+	envar := &entity.Envar{Project: project, Env: env, Name: name, Variables: map[string]interface{}{}}
 	json.Unmarshal([]byte(resp.Variables), &envar.Variables)
 
 	return envar, nil
@@ -62,6 +62,7 @@ func (r *repository) UpsertEnvar(data entity.Envar) error {
 
 	variables, _ := json.Marshal(&toUpperVariable)
 	_, err := r.cli.UpsertEnvar(ctx, &pbSpec.UpsertEnvarReq{
+		Project:   data.Project,
 		Env:       data.Env,
 		Name:      data.Name,
 		Variables: string(variables),
@@ -79,7 +80,7 @@ func (r *repository) UpsertEnvar(data entity.Envar) error {
 	return nil
 }
 
-func (r *repository) GetScale(env, name string) (*entity.Scale, error) {
+func (r *repository) GetScale(project, env, name string) (*entity.Scale, error) {
 	u := entity.User{}.FromFile()
 	if u == nil {
 		return nil, fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, "You are not login")
@@ -87,7 +88,7 @@ func (r *repository) GetScale(env, name string) (*entity.Scale, error) {
 
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
-	resp, err := r.cli.GetScale(ctx, &pbSpec.GetScaleReq{Env: env, Name: name})
+	resp, err := r.cli.GetScale(ctx, &pbSpec.GetScaleReq{Project: project, Env: env, Name: name})
 	if err != nil {
 		grsterr, errparse := grst_errors.NewFromError(err)
 		if errparse != nil {
@@ -100,6 +101,7 @@ func (r *repository) GetScale(env, name string) (*entity.Scale, error) {
 	}
 
 	scale := &entity.Scale{
+		Project:              project,
 		Env:                  env,
 		Name:                 name,
 		MinReplica:           int(resp.MinReplica),
@@ -122,6 +124,7 @@ func (r *repository) UpsertScale(data entity.Scale) error {
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
 	_, err := r.cli.UpsertScale(ctx, &pbSpec.UpsertScaleReq{
+		Project:              data.Project,
 		Env:                  data.Env,
 		Name:                 data.Name,
 		MinReplica:           int32(data.MinReplica),
@@ -145,7 +148,7 @@ func (r *repository) UpsertScale(data entity.Scale) error {
 	return nil
 }
 
-func (r *repository) GetPort(env, name string) (*entity.Port, error) {
+func (r *repository) GetPort(project, env, name string) (*entity.Port, error) {
 	u := entity.User{}.FromFile()
 	if u == nil {
 		return nil, fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, "You are not login")
@@ -153,7 +156,7 @@ func (r *repository) GetPort(env, name string) (*entity.Port, error) {
 
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
-	resp, err := r.cli.GetPort(ctx, &pbSpec.GetPortReq{Env: env, Name: name})
+	resp, err := r.cli.GetPort(ctx, &pbSpec.GetPortReq{Project: project, Env: env, Name: name})
 	if err != nil {
 		grsterr, errparse := grst_errors.NewFromError(err)
 		if errparse != nil {
@@ -174,7 +177,7 @@ func (r *repository) GetPort(env, name string) (*entity.Port, error) {
 			Protocol:   entity.PortType(p.Protocol),
 		})
 	}
-	port := &entity.Port{Env: env, Name: name, AccessType: entity.AccessType(resp.AccessType), ExternalIP: resp.ExternalIP, Ports: portSpecs}
+	port := &entity.Port{Project: project, Env: env, Name: name, AccessType: entity.AccessType(resp.AccessType), ExternalIP: resp.ExternalIP, Ports: portSpecs}
 	return port, nil
 }
 func (r *repository) UpsertPort(data entity.Port) error {
@@ -195,6 +198,7 @@ func (r *repository) UpsertPort(data entity.Port) error {
 		})
 	}
 	_, err := r.cli.UpsertPort(ctx, &pbSpec.UpsertPortReq{
+		Project:    data.Project,
 		Env:        data.Env,
 		Name:       data.Name,
 		AccessType: string(data.AccessType),
@@ -214,7 +218,7 @@ func (r *repository) UpsertPort(data entity.Port) error {
 	return nil
 }
 
-func (r *repository) GetAffinity(env, name string) (*entity.Affinity, error) {
+func (r *repository) GetAffinity(project, env, name string) (*entity.Affinity, error) {
 	u := entity.User{}.FromFile()
 	if u == nil {
 		return nil, fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, "You are not login")
@@ -222,7 +226,7 @@ func (r *repository) GetAffinity(env, name string) (*entity.Affinity, error) {
 
 	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
 
-	resp, err := r.cli.GetAffinity(ctx, &pbSpec.GetAffinityReq{Env: env, Name: name})
+	resp, err := r.cli.GetAffinity(ctx, &pbSpec.GetAffinityReq{Project: project, Env: env, Name: name})
 	if err != nil {
 		grsterr, errparse := grst_errors.NewFromError(err)
 		if errparse != nil {
@@ -248,7 +252,7 @@ func (r *repository) GetAffinity(env, name string) (*entity.Affinity, error) {
 		podAntiAffinity = append(podAntiAffinity, entity.AffinityTerm{Mode: entity.AffinityMode(a.Mode), Key: a.Key, Operator: entity.AffinityOperator(a.Operator), Values: a.Values, Weight: int(a.Weight), TopologyKey: a.TopologyKey})
 	}
 
-	affinity := &entity.Affinity{Env: env, Name: name, NodeAffinity: nodeAffinity, PodAffinity: podAffinity, PodAntiAffinity: podAntiAffinity}
+	affinity := &entity.Affinity{Project: project, Env: env, Name: name, NodeAffinity: nodeAffinity, PodAffinity: podAffinity, PodAntiAffinity: podAntiAffinity}
 
 	return affinity, nil
 }
@@ -276,6 +280,7 @@ func (r *repository) UpsertAffinity(data entity.Affinity) error {
 	}
 
 	_, err := r.cli.UpsertAffinity(ctx, &pbSpec.UpsertAffinityReq{
+		Project:         data.Project,
 		Env:             data.Env,
 		Name:            data.Name,
 		NodeAffinity:    nodeAffinity,

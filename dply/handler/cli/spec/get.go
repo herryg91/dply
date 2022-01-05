@@ -9,6 +9,7 @@ import (
 	envar_usecase "github.com/herryg91/dply/dply/app/usecase/envar"
 	port_usecase "github.com/herryg91/dply/dply/app/usecase/port"
 	scale_usecase "github.com/herryg91/dply/dply/app/usecase/scale"
+	"github.com/herryg91/dply/dply/entity"
 	"github.com/herryg91/dply/dply/pkg/serviceYaml"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -21,12 +22,14 @@ type CmdSpecGet struct {
 	scale_uc    scale_usecase.UseCase
 	affinity_uc affinity_usecase.UseCase
 
-	env  string
-	name string
+	project string
+	env     string
+	name    string
 }
 
-func newSpecGet(envar_uc envar_usecase.UseCase, port_uc port_usecase.UseCase, scale_uc scale_usecase.UseCase, affinity_uc affinity_usecase.UseCase) *CmdSpecGet {
+func newSpecGet(cfg *entity.Config, envar_uc envar_usecase.UseCase, port_uc port_usecase.UseCase, scale_uc scale_usecase.UseCase, affinity_uc affinity_usecase.UseCase) *CmdSpecGet {
 	c := &CmdSpecGet{
+		project:     cfg.Project,
 		envar_uc:    envar_uc,
 		port_uc:     port_uc,
 		scale_uc:    scale_uc,
@@ -56,7 +59,7 @@ func (c *CmdSpecGet) runCommand(cmd *cobra.Command, args []string) error {
 		}
 		c.name = data.Name
 	}
-	respEnvar, err := c.envar_uc.Get(c.env, c.name)
+	respEnvar, err := c.envar_uc.Get(c.project, c.env, c.name)
 	if err != nil {
 		if errors.Is(err, envar_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())
@@ -65,7 +68,7 @@ func (c *CmdSpecGet) runCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	respPort, err := c.port_uc.Get(c.env, c.name)
+	respPort, err := c.port_uc.Get(c.project, c.env, c.name)
 	if err != nil {
 		if errors.Is(err, port_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())
@@ -74,7 +77,7 @@ func (c *CmdSpecGet) runCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	respScale, err := c.scale_uc.Get(c.env, c.name)
+	respScale, err := c.scale_uc.Get(c.project, c.env, c.name)
 	if err != nil {
 		if errors.Is(err, scale_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())
@@ -83,7 +86,7 @@ func (c *CmdSpecGet) runCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	respAffinity, err := c.affinity_uc.Get(c.env, c.name)
+	respAffinity, err := c.affinity_uc.Get(c.project, c.env, c.name)
 	if err != nil {
 		if errors.Is(err, affinity_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())

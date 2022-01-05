@@ -1,6 +1,7 @@
 package entity
 
 type Affinity struct {
+	Project         string         `json:"-"`
 	Env             string         `json:"-"`
 	Name            string         `json:"-"`
 	NodeAffinity    []AffinityTerm `json:"node_affinity"`

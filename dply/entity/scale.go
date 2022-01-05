@@ -1,6 +1,7 @@
 package entity
 
 type Scale struct {
+	Project              string `json:"-"`
 	Env                  string `json:"-"`
 	Name                 string `json:"-"`
 	MinReplica           int    `json:"min_replica"`

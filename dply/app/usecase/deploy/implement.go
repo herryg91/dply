@@ -14,8 +14,8 @@ type usecase struct {
 func New(repo repository.DeployRepository) UseCase {
 	return &usecase{repo: repo}
 }
-func (uc *usecase) Deploy(env, name, digest string) error {
-	err := uc.repo.Deploy(env, name, digest)
+func (uc *usecase) Deploy(project, env, name, digest string) error {
+	err := uc.repo.Deploy(project, env, name, digest)
 	if err != nil {
 		if errors.Is(err, repository.ErrUnauthorized) {
 			return fmt.Errorf("%w: %v", ErrUnauthorized, "You are not login")
@@ -24,8 +24,8 @@ func (uc *usecase) Deploy(env, name, digest string) error {
 	}
 	return nil
 }
-func (uc *usecase) Redeploy(env, name string) error {
-	err := uc.repo.Redeploy(env, name)
+func (uc *usecase) Redeploy(project, env, name string) error {
+	err := uc.repo.Redeploy(project, env, name)
 	if err != nil {
 		if errors.Is(err, repository.ErrUnauthorized) {
 			return fmt.Errorf("%w: %v", ErrUnauthorized, "You are not login")

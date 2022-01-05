@@ -9,9 +9,9 @@ import (
 var ErrUnauthorizedAdmin = errors.New("unauthorized action (require admin access)")
 
 type ImageRepository interface {
-	Add(repoName, image, description string) error
+	Add(project, repoName, image, description string) error
 	Remove(repoName, digest string) error
-	Get(repoName string, page, size int) ([]entity.ContainerImage, error)
+	Get(project, repoName string, page, size int) ([]entity.ContainerImage, error)
 
 	// Build Docker Image
 	BuildImage(repo_full_name string, src string) (docker_image_ids []string, err error)

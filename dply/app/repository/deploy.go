@@ -1,6 +1,6 @@
 package repository
 
 type DeployRepository interface {
-	Deploy(env, name, digest string) error
-	Redeploy(env, name string) error
+	Deploy(project, env, name, digest string) error
+	Redeploy(project, env, name string) error
 }

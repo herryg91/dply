@@ -15,14 +15,19 @@ import (
 type CmdSpecAffinityEdit struct {
 	*cobra.Command
 	affinity_uc affinity_usecase.UseCase
-	cfg         *entity.Config
 
-	env  string
-	name string
+	project string
+	env     string
+	name    string
+	editor  string
 }
 
-func newSpecAffinityEdit(affinity_uc affinity_usecase.UseCase, cfg *entity.Config) *CmdSpecAffinityEdit {
-	c := &CmdSpecAffinityEdit{affinity_uc: affinity_uc, cfg: cfg}
+func newSpecAffinityEdit(cfg *entity.Config, affinity_uc affinity_usecase.UseCase) *CmdSpecAffinityEdit {
+	c := &CmdSpecAffinityEdit{
+		project:     cfg.Project,
+		affinity_uc: affinity_uc,
+		editor:      cfg.Editor,
+	}
 	c.Command = &cobra.Command{
 		Use:     "affinity-edit",
 		Aliases: []string{"ae"},
@@ -38,8 +43,6 @@ func newSpecAffinityEdit(affinity_uc affinity_usecase.UseCase, cfg *entity.Confi
 func (c *CmdSpecAffinityEdit) runCommand(cmd *cobra.Command, args []string) error {
 	if c.affinity_uc == nil {
 		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
-	} else if c.cfg == nil {
-		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
 	} else if c.env == "" {
 		return errors.New("`-e` is required")
 	} else if c.name == "" {
@@ -50,7 +53,7 @@ func (c *CmdSpecAffinityEdit) runCommand(cmd *cobra.Command, args []string) erro
 		c.name = data.Name
 	}
 
-	ok, err := c.affinity_uc.UpsertViaEditor(c.env, c.name, editor.EditorApp(c.cfg.Editor))
+	ok, err := c.affinity_uc.UpsertViaEditor(c.project, c.env, c.name, editor.EditorApp(c.editor))
 	if err != nil {
 		if errors.Is(err, affinity_usecase.ErrUnauthorized) {
 			logrus.Errorln(err.Error())
