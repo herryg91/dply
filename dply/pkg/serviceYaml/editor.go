@@ -7,8 +7,9 @@ import (
 )
 
 type ServiceYAML struct {
-	Name string `yaml:"name"`
-	Lang string `yaml:"lang"`
+	Name     string `yaml:"name"`
+	Lang     string `yaml:"lang"`
+	Category string `yaml:"category"`
 }
 
 func GetServiceYAML(filepath string) (ServiceYAML, error) {
