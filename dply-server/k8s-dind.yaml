@@ -7,7 +7,7 @@
 ##   --from-file=ca.key.pem=/local/ca/key.pem 
 
 # to get client certificate
-## kubectl -n dply cp <pod>:/certs/client/* ~/.dply/certs
+## kubectl -n dply cp <pod>:/certs/client/ ~/.dply/docker-certs
 
 ---
 apiVersion: apps/v1
