@@ -2,6 +2,7 @@ package cli_image
 
 import (
 	"errors"
+	"strings"
 
 	image_usecase "github.com/herryg91/dply/dply/app/usecase/image"
 	"github.com/herryg91/dply/dply/entity"
@@ -18,6 +19,7 @@ type CmdImageCreate struct {
 	name            string
 	description     string
 	registry_prefix string
+	build_args      []string
 }
 
 func newCmdImageCreate(cfg *entity.Config, image_uc image_usecase.UseCase) *CmdImageCreate {
@@ -31,6 +33,8 @@ func newCmdImageCreate(cfg *entity.Config, image_uc image_usecase.UseCase) *CmdI
 	c.Command.Flags().StringVarP(&c.name, "name", "n", "", "service (repository) name of image")
 	c.Command.Flags().StringVarP(&c.description, "desc", "d", "", "image description")
 	c.Command.Flags().StringVarP(&c.registry_prefix, "prefix", "p", "", "registry prefix")
+	c.Command.Flags().StringSliceVarP(&c.build_args, "arg", "a", []string{}, "build arguments")
+
 	return c
 }
 
@@ -46,18 +50,36 @@ func (c *CmdImageCreate) runCommand(cmd *cobra.Command, args []string) error {
 		}
 		c.name = data.Name
 	}
-	if c.registry_prefix == "" {
-		data, err := serviceYaml.GetServiceYAML("service.yaml")
-		if err == nil {
-			c.registry_prefix = data.Category
-		}
-	}
-
 	cfg := entity.Config{}.FromFile()
+	svcYaml, _ := serviceYaml.GetServiceYAML("service.yaml")
+	// Olah registry prefix
+	if c.registry_prefix == "" && svcYaml.Category != "" {
+		c.registry_prefix = svcYaml.Category
+	}
 	if c.registry_prefix != "" {
 		cfg.RegistryTagPrefix += "/" + c.registry_prefix
 	}
-	err := c.image_uc.Create(c.project, c.name, cfg.RegistryTagPrefix, c.description)
+
+	// Olah build_args
+	build_args_formatted := map[string]*string{}
+	for _, a := range c.build_args {
+		splitted_args := strings.SplitN(a, "=", 2)
+		if len(splitted_args) != 2 {
+			continue
+		}
+		val := splitted_args[1]
+		if len(val) >= 2 {
+			if string(val[0]) == `"` && string(val[len(val)-1]) == `"` {
+				val = val[1 : len(val)-1]
+			}
+		}
+		build_args_formatted[splitted_args[0]] = &val
+	}
+	for _, v := range svcYaml.BuildArgs {
+		build_args_formatted[v.Name] = &v.Value
+	}
+
+	err := c.image_uc.Create(c.project, c.name, cfg.RegistryTagPrefix, c.description, build_args_formatted)
 	if err != nil {
 		return err
 	}

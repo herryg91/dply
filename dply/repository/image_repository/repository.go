@@ -136,7 +136,7 @@ func (r *repository) Get(project, repoName string, page, size int) ([]entity.Con
 	return resp, nil
 }
 
-func (r *repository) BuildImage(repo_full_name string, src string) ([]string, error) {
+func (r *repository) BuildImage(repo_full_name string, src string, build_args map[string]*string) ([]string, error) {
 	u := entity.User{}.FromFile()
 	if u == nil {
 		return []string{}, fmt.Errorf("%w: %s", repository_intf.ErrUserUnauthorized, "You are not login")
@@ -150,6 +150,7 @@ func (r *repository) BuildImage(repo_full_name string, src string) ([]string, er
 	opts := types.ImageBuildOptions{
 		Dockerfile: "Dockerfile",
 		Tags:       []string{repo_full_name},
+		BuildArgs:  build_args,
 		// Tags:       []string{"gcr.io/emplogy/backend/" + data.Name},
 		Remove: true,
 	}

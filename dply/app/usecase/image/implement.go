@@ -27,7 +27,7 @@ func (uc *usecase) Add(project, repoName, image, description string) error {
 	return nil
 }
 
-func (uc *usecase) Create(project, name, tag_prefix, description string) error {
+func (uc *usecase) Create(project, name, tag_prefix, description string, build_args map[string]*string) error {
 	// Preparation
 	current_folder, _ := os.Getwd()
 	if _, err := os.Stat(current_folder + "/Dockerfile"); errors.Is(err, os.ErrNotExist) {
@@ -40,7 +40,7 @@ func (uc *usecase) Create(project, name, tag_prefix, description string) error {
 	repo_full_name := tag_prefix + name
 
 	fmt.Println("---------- 1. Building Docker Image ----------")
-	docker_image_ids, err := uc.repo.BuildImage(repo_full_name, current_folder)
+	docker_image_ids, err := uc.repo.BuildImage(repo_full_name, current_folder, build_args)
 	if err != nil {
 		if errors.Is(err, repository.ErrUnauthorized) {
 			return fmt.Errorf("%w: %v", ErrUnauthorized, "You are not login")

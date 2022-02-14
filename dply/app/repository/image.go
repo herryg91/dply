@@ -14,7 +14,7 @@ type ImageRepository interface {
 	Get(project, repoName string, page, size int) ([]entity.ContainerImage, error)
 
 	// Build Docker Image
-	BuildImage(repo_full_name string, src string) (docker_image_ids []string, err error)
+	BuildImage(repo_full_name string, src string, build_args map[string]*string) (docker_image_ids []string, err error)
 	// Push Image to Registry
 	PushImage(image_tag_name string) (digest string, err error)
 	DeleteImage(image_id string) error
