@@ -9,12 +9,12 @@ import (
 )
 
 type usecase struct {
-	repo           repository.ImageRepository
-	deplyment_repo repository.DeploymentRepository
+	repo            repository.ImageRepository
+	deployment_repo repository.DeploymentRepository
 }
 
-func New(repo repository.ImageRepository) UseCase {
-	return &usecase{repo: repo}
+func New(repo repository.ImageRepository, deployment_repo repository.DeploymentRepository) UseCase {
+	return &usecase{repo: repo, deployment_repo: deployment_repo}
 }
 
 func (uc *usecase) Get(project, repositoryName string, page, size int) ([]entity.Image, error) {
@@ -34,7 +34,7 @@ func (uc *usecase) Get(project, repositoryName string, page, size int) ([]entity
 	}
 
 	// Create Notes (last deployment environment)
-	deployments, err := uc.deplyment_repo.GetLatestDeploymentGroupByName(project, repositoryName)
+	deployments, err := uc.deployment_repo.GetLatestDeploymentGroupByName(project, repositoryName)
 	if err != nil {
 		return []entity.Image{}, fmt.Errorf("%w: %v", ErrUnexpected, err)
 	}

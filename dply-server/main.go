@@ -117,10 +117,11 @@ func main() {
 	user_hndl := handler.NewUserHandler(user_uc)
 
 	image_repo := image_repository.New(db)
-	image_uc := image_usecase.New(image_repo)
+	deploy_repo := deployment_repository.New(db)
+
+	image_uc := image_usecase.New(image_repo, deploy_repo)
 	image_hndl := handler.NewImageHandler(image_uc)
 
-	deploy_repo := deployment_repository.New(db)
 	k8s_repo := k8s_repository.New(k8sClient)
 	deploy_uc := deploy_usecase.New(deploy_repo, k8s_repo, image_uc, envar_uc, scale_uc, port_uc, affinity_uc)
 	deploy_hndl := handler.NewDeployHandler(deploy_uc)

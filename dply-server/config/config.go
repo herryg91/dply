@@ -30,8 +30,8 @@ func New() Config {
 	cfg := Config{}
 	envconfig.MustProcess("", &cfg)
 
-	// cfg.K8SKubeConfig = "/Users/hg/.kube/config"
-	// cfg.DBHost = "dply-mysql.dply.svc.cluster.local"
-	// cfg.DBPassword = "mysql@dply"
+	cfg.K8SKubeConfig = "/Users/hg/.kube/config"
+	cfg.DBHost = "dply-mysql.dply.svc.cluster.local"
+	cfg.DBPassword = "rnpNPePzXiWvBFCU"
 	return cfg
 }
