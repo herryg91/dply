@@ -131,6 +131,7 @@ func (r *repository) Get(project, repoName string, page, size int) ([]entity.Con
 			Description:    data.Description,
 			CreatedBy:      int(data.CreatedBy),
 			CreatedAt:      &createdAt,
+			Notes:          data.Notes,
 		})
 	}
 	return resp, nil

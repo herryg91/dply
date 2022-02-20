@@ -62,6 +62,7 @@ func (c *CmdImageList) runCommand(cmd *cobra.Command, args []string) error {
 		"Digest",
 		"Description",
 		"Created At",
+		"Notes",
 		// "Full Image",
 	})
 
@@ -70,6 +71,7 @@ func (c *CmdImageList) runCommand(cmd *cobra.Command, args []string) error {
 			data.Digest,
 			data.Description,
 			data.CreatedAt.Format(time.RFC3339),
+			data.Notes,
 			// data.Image,
 		}
 

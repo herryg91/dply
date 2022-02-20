@@ -76,8 +76,8 @@ type UnsafeDeployApiServer interface {
 	mustEmbedUnimplementedDeployApiServer()
 }
 
-func RegisterDeployApiServer(s grpc.ServiceRegistrar, srv DeployApiServer) {
-	s.RegisterService(&DeployApi_ServiceDesc, srv)
+func RegisterDeployApiServer(s *grpc.Server, srv DeployApiServer) {
+	s.RegisterService(&_DeployApi_serviceDesc, srv)
 }
 
 func _DeployApi_DeployImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -116,10 +116,7 @@ func _DeployApi_Redeploy_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-// DeployApi_ServiceDesc is the grpc.ServiceDesc for DeployApi service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var DeployApi_ServiceDesc = grpc.ServiceDesc{
+var _DeployApi_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "deploy.DeployApi",
 	HandlerType: (*DeployApiServer)(nil),
 	Methods: []grpc.MethodDesc{

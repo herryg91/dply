@@ -62,8 +62,8 @@ type UnsafeServerApiServer interface {
 	mustEmbedUnimplementedServerApiServer()
 }
 
-func RegisterServerApiServer(s grpc.ServiceRegistrar, srv ServerApiServer) {
-	s.RegisterService(&ServerApi_ServiceDesc, srv)
+func RegisterServerApiServer(s *grpc.Server, srv ServerApiServer) {
+	s.RegisterService(&_ServerApi_serviceDesc, srv)
 }
 
 func _ServerApi_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -84,10 +84,7 @@ func _ServerApi_Status_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-// ServerApi_ServiceDesc is the grpc.ServiceDesc for ServerApi service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var ServerApi_ServiceDesc = grpc.ServiceDesc{
+var _ServerApi_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "server.ServerApi",
 	HandlerType: (*ServerApiServer)(nil),
 	Methods: []grpc.MethodDesc{

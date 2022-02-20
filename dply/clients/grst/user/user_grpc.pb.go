@@ -90,8 +90,8 @@ type UnsafeUserApiServer interface {
 	mustEmbedUnimplementedUserApiServer()
 }
 
-func RegisterUserApiServer(s grpc.ServiceRegistrar, srv UserApiServer) {
-	s.RegisterService(&UserApi_ServiceDesc, srv)
+func RegisterUserApiServer(s *grpc.Server, srv UserApiServer) {
+	s.RegisterService(&_UserApi_serviceDesc, srv)
 }
 
 func _UserApi_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -148,10 +148,7 @@ func _UserApi_UpdatePassword_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-// UserApi_ServiceDesc is the grpc.ServiceDesc for UserApi service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var UserApi_ServiceDesc = grpc.ServiceDesc{
+var _UserApi_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "user.UserApi",
 	HandlerType: (*UserApiServer)(nil),
 	Methods: []grpc.MethodDesc{
