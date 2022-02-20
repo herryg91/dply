@@ -7,6 +7,7 @@ import (
 	image_usecase "github.com/herryg91/dply/dply-server/app/usecase/image"
 	"github.com/herryg91/dply/dply-server/config"
 	"github.com/herryg91/dply/dply-server/pkg/db/mysql"
+	"github.com/herryg91/dply/dply-server/repository/deployment_repository"
 	"github.com/herryg91/dply/dply-server/repository/image_repository"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
@@ -21,8 +22,9 @@ func main() {
 	if err != nil {
 		logrus.Panicln("Failed to Initialized mysql DB:", err)
 	}
+	deploy_repo := deployment_repository.New(db)
 	image_repo := image_repository.New(db)
-	image_uc := image_usecase.New(image_repo)
+	image_uc := image_usecase.New(image_repo, deploy_repo)
 
 	// Init Flag
 	var digest string
