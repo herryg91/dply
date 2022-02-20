@@ -32,6 +32,27 @@ func (r *repository) Get(project, env, name string) (*entity.Deployment, error) 
 	return deploymentModel.ToDeploymentEntity(), nil
 }
 
+func (r *repository) GetLatestDeploymentGroupByName(project, name string) ([]*entity.Deployment, error) {
+	deployments := []*DeploymentModel{}
+	err := r.db.Raw(`
+		SELECT d1.*
+		FROM deployment d1
+		LEFT JOIN deployment d2 ON (d1.env = d2.env AND d1.name = d2.name AND d1.id < d2.id)
+		WHERE d1.project = ?
+		AND d1.name = ?
+		AND d2.id IS NULL
+	`, project, name).Find(&deployments).Error
+	if err != nil {
+		return nil, err
+	}
+	resp := []*entity.Deployment{}
+	for _, d := range deployments {
+		resp = append(resp, d.ToDeploymentEntity())
+	}
+
+	return resp, nil
+}
+
 func (r *repository) Create(in entity.Deployment) error {
 	variables, _ := json.Marshal(in.Envar.Variables)
 	portsJson := map[string]interface{}{

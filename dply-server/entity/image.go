@@ -13,4 +13,5 @@ type Image struct {
 	Description string     `json:"description"`
 	CreatedBy   int        `json:"created_by"`
 	CreatedAt   *time.Time `json:"created_at"`
+	Notes       string     `json:"notes"` // This is for environment last deployment
 }

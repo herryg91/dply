@@ -38,6 +38,7 @@ message Image {
     string Description = 6 [json_name="description"];
     int32 CreatedBy = 7 [json_name="created_by"];
     google.protobuf.Timestamp CreatedAt = 8 [json_name="created_at"];
+    string Notes = 10 [json_name="notes"];
 }
 
 message Images {

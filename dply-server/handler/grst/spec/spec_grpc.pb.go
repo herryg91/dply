@@ -160,8 +160,8 @@ type UnsafeSpecApiServer interface {
 	mustEmbedUnimplementedSpecApiServer()
 }
 
-func RegisterSpecApiServer(s grpc.ServiceRegistrar, srv SpecApiServer) {
-	s.RegisterService(&SpecApi_ServiceDesc, srv)
+func RegisterSpecApiServer(s *grpc.Server, srv SpecApiServer) {
+	s.RegisterService(&_SpecApi_serviceDesc, srv)
 }
 
 func _SpecApi_GetEnvar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -308,10 +308,7 @@ func _SpecApi_UpsertAffinity_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-// SpecApi_ServiceDesc is the grpc.ServiceDesc for SpecApi service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var SpecApi_ServiceDesc = grpc.ServiceDesc{
+var _SpecApi_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "spec.SpecApi",
 	HandlerType: (*SpecApiServer)(nil),
 	Methods: []grpc.MethodDesc{

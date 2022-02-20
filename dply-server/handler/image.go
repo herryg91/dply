@@ -43,6 +43,7 @@ func (h *handlerImage) Get(ctx context.Context, req *pbImage.GetReq) (*pbImage.I
 			Description: data.Description,
 			CreatedBy:   int32(data.CreatedBy),
 			CreatedAt:   timestamppb.New(*data.CreatedAt),
+			Notes:       data.Notes,
 		})
 	}
 

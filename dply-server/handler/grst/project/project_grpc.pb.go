@@ -90,8 +90,8 @@ type UnsafeProjectApiServer interface {
 	mustEmbedUnimplementedProjectApiServer()
 }
 
-func RegisterProjectApiServer(s grpc.ServiceRegistrar, srv ProjectApiServer) {
-	s.RegisterService(&ProjectApi_ServiceDesc, srv)
+func RegisterProjectApiServer(s *grpc.Server, srv ProjectApiServer) {
+	s.RegisterService(&_ProjectApi_serviceDesc, srv)
 }
 
 func _ProjectApi_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -148,10 +148,7 @@ func _ProjectApi_Delete_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-// ProjectApi_ServiceDesc is the grpc.ServiceDesc for ProjectApi service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var ProjectApi_ServiceDesc = grpc.ServiceDesc{
+var _ProjectApi_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "project.ProjectApi",
 	HandlerType: (*ProjectApiServer)(nil),
 	Methods: []grpc.MethodDesc{

@@ -9,7 +9,8 @@ import (
 )
 
 type usecase struct {
-	repo repository.ImageRepository
+	repo           repository.ImageRepository
+	deplyment_repo repository.DeploymentRepository
 }
 
 func New(repo repository.ImageRepository) UseCase {
@@ -31,6 +32,27 @@ func (uc *usecase) Get(project, repositoryName string, page, size int) ([]entity
 	if err != nil {
 		return []entity.Image{}, fmt.Errorf("%w: %v", ErrUnexpected, err)
 	}
+
+	// Create Notes (last deployment environment)
+	deployments, err := uc.deplyment_repo.GetLatestDeploymentGroupByName(project, repositoryName)
+	if err != nil {
+		return []entity.Image{}, fmt.Errorf("%w: %v", ErrUnexpected, err)
+	}
+	map_images_env := map[string]string{}
+	for _, d := range deployments {
+		if _, ok := map_images_env[d.DeploymentImage.Digest]; !ok {
+			map_images_env[d.DeploymentImage.Digest] = d.Env
+		} else {
+			map_images_env[d.DeploymentImage.Digest] += " | " + d.Env
+		}
+	}
+
+	for i, r := range resp {
+		if notes, ok := map_images_env[r.Digest]; ok {
+			resp[i].Notes = notes
+		}
+	}
+
 	return resp, nil
 }
 
