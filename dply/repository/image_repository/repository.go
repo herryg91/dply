@@ -22,17 +22,59 @@ import (
 )
 
 type repository struct {
-	cli               pbImage.ImageApiClient
-	docker_cli        *client.Client
+	cli pbImage.ImageApiClient
+	// docker_cli        *client.Client
+	docker_cert_path string
+	docker_host      string
+	docker_version   string
+
 	registry_username string
 	registry_password string
 	registry_host     string
 }
 
 func New(cli pbImage.ImageApiClient, cfg *entity.Config) (repository_intf.ImageRepository, error) {
-	certFile := cfg.DockerCertificatesPath + "/cert.pem"
-	keyFile := cfg.DockerCertificatesPath + "/key.pem"
-	caFile := cfg.DockerCertificatesPath + "/ca.pem"
+	// certFile := cfg.DockerCertificatesPath + "/cert.pem"
+	// keyFile := cfg.DockerCertificatesPath + "/key.pem"
+	// caFile := cfg.DockerCertificatesPath + "/ca.pem"
+
+	// cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// // Load CA cert
+	// caCert, err := ioutil.ReadFile(caFile)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// caCertPool := x509.NewCertPool()
+	// caCertPool.AppendCertsFromPEM(caCert)
+
+	// customTransport := &(*http.DefaultTransport.(*http.Transport)) // make shallow copy
+	// customTransport.TLSClientConfig = &tls.Config{
+	// 	Certificates: []tls.Certificate{cert},
+	// 	RootCAs:      caCertPool,
+	// }
+
+	// dockerClient, err := client.NewClient(cfg.DockerHost, cfg.DockerVersion, &http.Client{Transport: customTransport}, map[string]string{})
+	// if err != nil {
+	// 	return nil, err
+	// }
+	return &repository{
+		cli:               cli,
+		docker_cert_path:  cfg.DockerCertificatesPath,
+		docker_host:       cfg.DockerHost,
+		docker_version:    cfg.DockerVersion,
+		registry_host:     cfg.RegistryHost,
+		registry_username: cfg.RegistryUsername,
+		registry_password: cfg.RegistryPassword}, nil
+}
+
+func new_create_docker_cli(docker_cert_path, docker_host, docker_version string) (*client.Client, error) {
+	certFile := docker_cert_path + "/cert.pem"
+	keyFile := docker_cert_path + "/key.pem"
+	caFile := docker_cert_path + "/ca.pem"
 
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
@@ -53,19 +95,12 @@ func New(cli pbImage.ImageApiClient, cfg *entity.Config) (repository_intf.ImageR
 		RootCAs:      caCertPool,
 	}
 
-	dockerClient, err := client.NewClient(cfg.DockerHost, cfg.DockerVersion, &http.Client{Transport: customTransport}, map[string]string{})
+	dockerClient, err := client.NewClient(docker_host, docker_version, &http.Client{Transport: customTransport}, map[string]string{})
 	if err != nil {
 		return nil, err
 	}
-	return &repository{
-		cli:        cli,
-		docker_cli: dockerClient,
-		registry_host: cfg.
-			RegistryHost, registry_username: cfg.
-			RegistryUsername,
-		registry_password: cfg.RegistryPassword}, nil
+	return dockerClient, nil
 }
-
 func (r *repository) Add(project, repoName, image, description string) error {
 	u := entity.User{}.FromFile()
 	if u == nil {
@@ -142,6 +177,10 @@ func (r *repository) BuildImage(repo_full_name string, src string, build_args ma
 	if u == nil {
 		return []string{}, fmt.Errorf("%w: %s", repository_intf.ErrUserUnauthorized, "You are not login")
 	}
+	docker_cli, err := new_create_docker_cli(r.docker_cert_path, r.docker_host, r.docker_version)
+	if err != nil {
+		return []string{}, fmt.Errorf("%w: %s", repository_intf.ErrUserUnexpected, err.Error())
+	}
 
 	tar, err := archive.TarWithOptions(src+"/", &archive.TarOptions{})
 	if err != nil {
@@ -156,7 +195,7 @@ func (r *repository) BuildImage(repo_full_name string, src string, build_args ma
 		Remove: true,
 	}
 
-	res, err := r.docker_cli.ImageBuild(context.Background(), tar, opts)
+	res, err := docker_cli.ImageBuild(context.Background(), tar, opts)
 	if err != nil {
 		return []string{}, err
 	}
@@ -176,6 +215,10 @@ func (r *repository) PushImage(image_tag_name string) (digest string, err error)
 	if u == nil {
 		return "", fmt.Errorf("%w: %s", repository_intf.ErrUserUnauthorized, "You are not login")
 	}
+	docker_cli, err := new_create_docker_cli(r.docker_cert_path, r.docker_host, r.docker_version)
+	if err != nil {
+		return "", fmt.Errorf("%w: %s", repository_intf.ErrUserUnexpected, err.Error())
+	}
 
 	// https://cloud.google.com/container-registry/docs/advanced-authentication
 	var authConfig = types.AuthConfig{
@@ -188,7 +231,7 @@ func (r *repository) PushImage(image_tag_name string) (digest string, err error)
 
 	optsPush := types.ImagePushOptions{RegistryAuth: authConfigEncoded}
 
-	rd, err := r.docker_cli.ImagePush(context.Background(), image_tag_name, optsPush)
+	rd, err := docker_cli.ImagePush(context.Background(), image_tag_name, optsPush)
 	if err != nil {
 		return "", err
 	}
@@ -208,8 +251,12 @@ func (r *repository) DeleteImage(image_id string) error {
 	if u == nil {
 		return fmt.Errorf("%w: %s", repository_intf.ErrUserUnauthorized, "You are not login")
 	}
+	docker_cli, err := new_create_docker_cli(r.docker_cert_path, r.docker_host, r.docker_version)
+	if err != nil {
+		return fmt.Errorf("%w: %s", repository_intf.ErrUserUnexpected, err.Error())
+	}
 
-	_, err := r.docker_cli.ImageRemove(context.Background(), image_id, types.ImageRemoveOptions{PruneChildren: true})
+	_, err = docker_cli.ImageRemove(context.Background(), image_id, types.ImageRemoveOptions{PruneChildren: true})
 	if err != nil {
 		return err
 	}
