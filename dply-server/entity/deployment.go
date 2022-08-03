@@ -6,16 +6,17 @@ import (
 )
 
 type Deployment struct {
-	Id              int      `json:"id"`
-	Project         string   `json:"project"`
-	Env             string   `json:"env"`
-	Name            string   `json:"name"`
-	DeploymentImage Image    `json:"image_detail"`
-	Envar           Envar    `json:"variables"`
-	Port            Port     `json:"ports"`
-	Scale           Scale    `json:"scale"`
-	Affinity        Affinity `json:"affinity"`
-	CreatedBy       int      `json_name:"created_by"`
+	Id               int              `json:"id"`
+	Project          string           `json:"project"`
+	Env              string           `json:"env"`
+	Name             string           `json:"name"`
+	DeploymentImage  Image            `json:"image_detail"`
+	Envar            Envar            `json:"variables"`
+	Port             Port             `json:"ports"`
+	Scale            Scale            `json:"scale"`
+	Affinity         Affinity         `json:"affinity"`
+	DeploymentConfig DeploymentConfig `json:"deployment_config"`
+	CreatedBy        int              `json_name:"created_by"`
 }
 
 func (d1 *Deployment) IsDifferentDeploymentConfig(d2 Deployment) bool {

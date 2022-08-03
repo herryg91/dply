@@ -17,28 +17,50 @@ import (
 )
 
 type fullMethods struct {
-	SpecApi_GetEnvar       string
-	SpecApi_UpsertEnvar    string
-	SpecApi_GetScale       string
-	SpecApi_UpsertScale    string
-	SpecApi_GetPort        string
-	SpecApi_UpsertPort     string
-	SpecApi_GetAffinity    string
-	SpecApi_UpsertAffinity string
+	SpecApi_GetEnvar               string
+	SpecApi_UpsertEnvar            string
+	SpecApi_GetScale               string
+	SpecApi_UpsertScale            string
+	SpecApi_GetPort                string
+	SpecApi_UpsertPort             string
+	SpecApi_GetAffinity            string
+	SpecApi_UpsertAffinity         string
+	SpecApi_GetDeploymentConfig    string
+	SpecApi_UpsertDeploymentConfig string
 }
 
 var FullMethods = fullMethods{
-	SpecApi_GetEnvar:       "/spec.SpecApi/GetEnvar",
-	SpecApi_UpsertEnvar:    "/spec.SpecApi/UpsertEnvar",
-	SpecApi_GetScale:       "/spec.SpecApi/GetScale",
-	SpecApi_UpsertScale:    "/spec.SpecApi/UpsertScale",
-	SpecApi_GetPort:        "/spec.SpecApi/GetPort",
-	SpecApi_UpsertPort:     "/spec.SpecApi/UpsertPort",
-	SpecApi_GetAffinity:    "/spec.SpecApi/GetAffinity",
-	SpecApi_UpsertAffinity: "/spec.SpecApi/UpsertAffinity",
+	SpecApi_GetEnvar:               "/spec.SpecApi/GetEnvar",
+	SpecApi_UpsertEnvar:            "/spec.SpecApi/UpsertEnvar",
+	SpecApi_GetScale:               "/spec.SpecApi/GetScale",
+	SpecApi_UpsertScale:            "/spec.SpecApi/UpsertScale",
+	SpecApi_GetPort:                "/spec.SpecApi/GetPort",
+	SpecApi_UpsertPort:             "/spec.SpecApi/UpsertPort",
+	SpecApi_GetAffinity:            "/spec.SpecApi/GetAffinity",
+	SpecApi_UpsertAffinity:         "/spec.SpecApi/UpsertAffinity",
+	SpecApi_GetDeploymentConfig:    "/spec.SpecApi/GetDeploymentConfig",
+	SpecApi_UpsertDeploymentConfig: "/spec.SpecApi/UpsertDeploymentConfig",
 }
 
 var NeedAuthFullMethods = []string{}
+
+type AuthConfig struct {
+	NeedAuth bool
+	Roles    []string
+}
+
+var AuthConfigFullMethods = map[string]AuthConfig{
+	"/spec.SpecApi/GetEnvar":               AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/spec.SpecApi/UpsertEnvar":            AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/spec.SpecApi/GetScale":               AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/spec.SpecApi/UpsertScale":            AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/spec.SpecApi/GetPort":                AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/spec.SpecApi/UpsertPort":             AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/spec.SpecApi/GetAffinity":            AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/spec.SpecApi/UpsertAffinity":         AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/spec.SpecApi/GetDeploymentConfig":    AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/spec.SpecApi/UpsertDeploymentConfig": AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+}
 
 var NeedApiKeyFullMethods = []string{}
 
@@ -75,6 +97,10 @@ func RegisterSpecApiGrstServer(grpcRestServer *grst.Server, hndl SpecApiServer) 
 	forward_SpecApi_GetAffinity_0 = grpcRestServer.GetForwardResponseMessage()
 
 	forward_SpecApi_UpsertAffinity_0 = grpcRestServer.GetForwardResponseMessage()
+
+	forward_SpecApi_GetDeploymentConfig_0 = grpcRestServer.GetForwardResponseMessage()
+
+	forward_SpecApi_UpsertDeploymentConfig_0 = grpcRestServer.GetForwardResponseMessage()
 
 	RegisterSpecApiServer(grpcRestServer.GetGrpcServer(), hndl)
 	grpcRestServer.RegisterRestHandler(RegisterSpecApiHandler)

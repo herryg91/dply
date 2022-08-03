@@ -6,6 +6,7 @@ import (
 
 	"github.com/herryg91/dply/dply-server/app/repository"
 	affinity_usecase "github.com/herryg91/dply/dply-server/app/usecase/affinity"
+	deployment_config_usecase "github.com/herryg91/dply/dply-server/app/usecase/deployment_config"
 	envar_usecase "github.com/herryg91/dply/dply-server/app/usecase/envar"
 	image_usecase "github.com/herryg91/dply/dply-server/app/usecase/image"
 	port_usecase "github.com/herryg91/dply/dply-server/app/usecase/port"
@@ -14,13 +15,14 @@ import (
 )
 
 type usecase struct {
-	deploy_repo repository.DeploymentRepository
-	k8s_repo    repository.K8sRepository
-	image_uc    image_usecase.UseCase
-	envar_uc    envar_usecase.UseCase
-	scale_uc    scale_usecase.UseCase
-	port_uc     port_usecase.UseCase
-	affinity_uc affinity_usecase.UseCase
+	deploy_repo          repository.DeploymentRepository
+	k8s_repo             repository.K8sRepository
+	image_uc             image_usecase.UseCase
+	envar_uc             envar_usecase.UseCase
+	scale_uc             scale_usecase.UseCase
+	port_uc              port_usecase.UseCase
+	affinity_uc          affinity_usecase.UseCase
+	deployment_config_uc deployment_config_usecase.UseCase
 }
 
 func New(
@@ -31,15 +33,17 @@ func New(
 	scale_uc scale_usecase.UseCase,
 	port_uc port_usecase.UseCase,
 	affinity_uc affinity_usecase.UseCase,
+	deployment_config_uc deployment_config_usecase.UseCase,
 ) UseCase {
 	return &usecase{
-		deploy_repo: deploy_repo,
-		k8s_repo:    k8s_repo,
-		image_uc:    image_uc,
-		envar_uc:    envar_uc,
-		scale_uc:    scale_uc,
-		port_uc:     port_uc,
-		affinity_uc: affinity_uc,
+		deploy_repo:          deploy_repo,
+		k8s_repo:             k8s_repo,
+		image_uc:             image_uc,
+		envar_uc:             envar_uc,
+		scale_uc:             scale_uc,
+		port_uc:              port_uc,
+		affinity_uc:          affinity_uc,
+		deployment_config_uc: deployment_config_uc,
 	}
 }
 
@@ -69,16 +73,29 @@ func (uc *usecase) DeployImage(project string, env string, name string, digest s
 		currentAffinity = entity.Affinity{}.DefaultAffinity(env, name)
 	}
 
+	currentDeploymentConfig, _ := uc.deployment_config_uc.Get(project, env, name)
+	if currentDeploymentConfig == nil {
+		currentDeploymentConfig = &entity.DeploymentConfig{
+			Project:        project,
+			Env:            env,
+			Name:           name,
+			LivenessProbe:  nil,
+			ReadinessProbe: nil,
+			StartupProbe:   nil,
+		}
+	}
+
 	newDeployment := entity.Deployment{
-		Project:         project,
-		Env:             env,
-		Name:            name,
-		DeploymentImage: *currentImage,
-		Envar:           *currentEnvar,
-		Port:            *currentPort,
-		Scale:           *currentScale,
-		Affinity:        *currentAffinity,
-		CreatedBy:       createdBy,
+		Project:          project,
+		Env:              env,
+		Name:             name,
+		DeploymentImage:  *currentImage,
+		Envar:            *currentEnvar,
+		Port:             *currentPort,
+		Scale:            *currentScale,
+		Affinity:         *currentAffinity,
+		DeploymentConfig: *currentDeploymentConfig,
+		CreatedBy:        createdBy,
 	}
 
 	// Check if redeploy or new deployment
