@@ -31,6 +31,47 @@ func NewDeploymentParam(param entity.Deployment) *v1.Deployment {
 		})
 	}
 
+	var liveness_probe, readiness_probe, startup_probe *corev1.Probe = nil, nil, nil
+	if param.DeploymentConfig.LivenessProbe != nil && param.DeploymentConfig.LivenessProbe.Path != "" && param.DeploymentConfig.LivenessProbe.Port > 0 {
+		liveness_probe = &corev1.Probe{
+			Handler: corev1.Handler{
+				HTTPGet: &corev1.HTTPGetAction{
+					Path: param.DeploymentConfig.LivenessProbe.Path,
+					Port: intstr.FromInt(param.DeploymentConfig.LivenessProbe.Port),
+				},
+			},
+			FailureThreshold:    int32(param.DeploymentConfig.LivenessProbe.FailureThreshold),
+			InitialDelaySeconds: int32(param.DeploymentConfig.LivenessProbe.InitialDelaySeconds),
+			PeriodSeconds:       int32(param.DeploymentConfig.LivenessProbe.PeriodSeconds),
+		}
+	}
+	if param.DeploymentConfig.ReadinessProbe != nil && param.DeploymentConfig.ReadinessProbe.Path != "" && param.DeploymentConfig.ReadinessProbe.Port > 0 {
+		readiness_probe = &corev1.Probe{
+			Handler: corev1.Handler{
+				HTTPGet: &corev1.HTTPGetAction{
+					Path: param.DeploymentConfig.ReadinessProbe.Path,
+					Port: intstr.FromInt(param.DeploymentConfig.ReadinessProbe.Port),
+				},
+			},
+			FailureThreshold:    int32(param.DeploymentConfig.ReadinessProbe.FailureThreshold),
+			InitialDelaySeconds: int32(param.DeploymentConfig.ReadinessProbe.InitialDelaySeconds),
+			PeriodSeconds:       int32(param.DeploymentConfig.ReadinessProbe.PeriodSeconds),
+		}
+	}
+	if param.DeploymentConfig.StartupProbe != nil && param.DeploymentConfig.StartupProbe.Path != "" && param.DeploymentConfig.StartupProbe.Port > 0 {
+		startup_probe = &corev1.Probe{
+			Handler: corev1.Handler{
+				HTTPGet: &corev1.HTTPGetAction{
+					Path: param.DeploymentConfig.StartupProbe.Path,
+					Port: intstr.FromInt(param.DeploymentConfig.StartupProbe.Port),
+				},
+			},
+			FailureThreshold:    int32(param.DeploymentConfig.StartupProbe.FailureThreshold),
+			InitialDelaySeconds: int32(param.DeploymentConfig.StartupProbe.InitialDelaySeconds),
+			PeriodSeconds:       int32(param.DeploymentConfig.StartupProbe.PeriodSeconds),
+		}
+	}
+
 	deployment := &v1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      param.Name,
@@ -79,7 +120,10 @@ func NewDeploymentParam(param entity.Deployment) *v1.Deployment {
 									apiv1.ResourceMemory: resource.MustParse(strconv.Itoa(param.Scale.MinMemory) + "M"),
 								},
 							},
-							Ports: ports,
+							Ports:          ports,
+							LivenessProbe:  liveness_probe,
+							ReadinessProbe: readiness_probe,
+							StartupProbe:   startup_probe,
 						},
 					},
 				},

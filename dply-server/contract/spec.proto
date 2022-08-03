@@ -85,6 +85,19 @@ service SpecApi {
     //        body: "*"
     //    };
     //}
+
+    rpc GetDeploymentConfig(GetDeploymentConfigReq) returns (DeploymentConfig) {
+        option (google.api.http) = {
+            get: "/spec/deployment-config"
+        };
+    }
+
+    rpc UpsertDeploymentConfig(UpsertDeploymentConfigReq) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/spec/deployment-config/upsert"
+            body: "*"
+        };
+    }
 }
 
 // Variable
@@ -224,3 +237,35 @@ message UpdateAffinityTemplateReq {
 	repeated AffinityTerm PodAffinity = 3 [json_name="pod_affinity"];
 	repeated AffinityTerm PodAntiAffinity = 4 [json_name="pod_anti_affinity"];
 }
+
+// Deployment Config Section
+
+message GetDeploymentConfigReq {
+    string Project = 3 [json_name="project", (cdd.api.default) = "default"];
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+}
+
+message UpsertDeploymentConfigReq {
+    string Project = 6 [json_name="project", (cdd.api.default) = "default"];
+    string Env = 1 [json_name="env", (cdd.api.validate) = "required"];
+    string Name = 2 [json_name="name", (cdd.api.validate) = "required"];
+    HttpGetProbe LivenessProbe = 3 [json_name="liveness_probe"];
+	HttpGetProbe ReadinessProbe = 4 [json_name="readiness_probe"];
+	HttpGetProbe StartupProbe = 5 [json_name="startup_probe"];
+}
+
+message DeploymentConfig {
+    HttpGetProbe LivenessProbe = 1 [json_name="liveness_probe"];
+	HttpGetProbe ReadinessProbe = 2 [json_name="readiness_probe"];
+	HttpGetProbe StartupProbe = 3 [json_name="startup_probe"];
+}
+
+message HttpGetProbe {
+    string Path = 1 [json_name="path"];
+	int32 Port = 2 [json_name="port"];
+	int32 FailureThreshold = 3 [json_name="failure_threshold"];
+    int32 PeriodSeconds = 4 [json_name="period_seconds"];
+    int32 InitialDelaySeconds = 5 [json_name="initial_delay_seconds"];
+}
+
