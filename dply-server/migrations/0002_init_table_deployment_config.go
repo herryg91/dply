@@ -27,6 +27,7 @@ func (m *migration_0002) Up() error {
 	err := m.db.Exec(`
 	CREATE TABLE deployment_config (
 		id INT NOT NULL AUTO_INCREMENT,
+		project VARCHAR(128) NOT NULL,
 		env VARCHAR(255) NOT NULL,
 		name VARCHAR(255) NOT NULL,
 		config JSON NOT NULL,
@@ -34,7 +35,7 @@ func (m *migration_0002) Up() error {
 		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY ( id ),
-		UNIQUE(env, name)
+		UNIQUE(project, env, name)
 	);
 	`).Error
 	if err != nil {

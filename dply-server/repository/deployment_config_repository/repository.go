@@ -24,7 +24,7 @@ func (r *repository) Get(project, env, name string) (*entity.DeploymentConfig, e
 	err := r.db.Table("deployment_config").Where("project = ? AND env = ? AND name = ?", project, env, name).First(&dcModel).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, repository_intf.ErrAffinityNotFound
+			return nil, repository_intf.ErrDeploymentConfigNotFound
 		}
 		return nil, err
 	}
