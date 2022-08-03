@@ -16,4 +16,7 @@ type SpecRepository interface {
 
 	GetAffinity(project, env, name string) (*entity.Affinity, error)
 	UpsertAffinity(data entity.Affinity) error
+
+	GetDeploymentConfig(project, env, name string) (*entity.DeploymentConfig, error)
+	UpsertDeploymentConfig(data entity.DeploymentConfig) error
 }
