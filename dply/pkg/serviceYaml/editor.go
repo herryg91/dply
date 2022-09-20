@@ -8,6 +8,7 @@ import (
 
 type ServiceYAML struct {
 	Name      string `yaml:"name"`
+	Project   string `yaml:"project"`
 	Lang      string `yaml:"lang"`
 	Category  string `yaml:"category"`
 	BuildArgs []Args `yaml:"build_args"`

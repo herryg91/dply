@@ -41,6 +41,14 @@ func newSpecPortEdit(cfg *entity.Config, port_uc port_usecase.UseCase) *CmdSpecP
 }
 
 func (c *CmdSpecPortEdit) runCommand(cmd *cobra.Command, args []string) error {
+	service_yaml_data, err := serviceYaml.GetServiceYAML("service.yaml")
+	if err != nil {
+		return err
+	}
+	if service_yaml_data.Project != "" {
+		c.project = service_yaml_data.Project
+	}
+
 	if c.port_uc == nil {
 		return errors.New("You haven't configure config. command: `dply-cli config --server=<dply_server_host>`")
 	} else if c.env == "" {
