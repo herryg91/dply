@@ -5,6 +5,7 @@ import (
 
 	"github.com/herryg91/dply/dply/app/repository"
 	affinity_usecase "github.com/herryg91/dply/dply/app/usecase/affinity"
+	deployment_config_usecase "github.com/herryg91/dply/dply/app/usecase/deployment-config"
 	envar_usecase "github.com/herryg91/dply/dply/app/usecase/envar"
 	port_usecase "github.com/herryg91/dply/dply/app/usecase/port"
 	scale_usecase "github.com/herryg91/dply/dply/app/usecase/scale"
@@ -27,6 +28,7 @@ func New() *CmdSpec {
 	var envar_uc envar_usecase.UseCase = nil
 	var port_uc port_usecase.UseCase = nil
 	var affinity_uc affinity_usecase.UseCase = nil
+	var deployment_config_uc deployment_config_usecase.UseCase = nil
 
 	if cfg != nil {
 		var err error
@@ -40,6 +42,7 @@ func New() *CmdSpec {
 		envar_uc = envar_usecase.New(spec_repo)
 		port_uc = port_usecase.New(spec_repo)
 		affinity_uc = affinity_usecase.New(spec_repo)
+		deployment_config_uc = deployment_config_usecase.New(spec_repo)
 	}
 
 	c := &CmdSpec{}
@@ -58,6 +61,8 @@ func New() *CmdSpec {
 	c.AddCommand(newSpecPortEdit(cfg, port_uc).Command)
 	c.AddCommand(newSpecAffinityGet(cfg, affinity_uc).Command)
 	c.AddCommand(newSpecAffinityEdit(cfg, affinity_uc).Command)
+	c.AddCommand(newSpecDeploymentConfigGet(cfg, deployment_config_uc).Command)
+	c.AddCommand(newSpecDeploymentConfigEdit(cfg, deployment_config_uc).Command)
 
 	return c
 }

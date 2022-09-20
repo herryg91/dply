@@ -30,6 +30,17 @@ var FullMethods = fullMethods{
 
 var NeedAuthFullMethods = []string{}
 
+type AuthConfig struct {
+	NeedAuth bool
+	Roles    []string
+}
+
+var AuthConfigFullMethods = map[string]AuthConfig{
+	"/project.ProjectApi/GetAll": AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/project.ProjectApi/Create": AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+	"/project.ProjectApi/Delete": AuthConfig{NeedAuth: false, Roles: []string{"*"}},
+}
+
 var NeedApiKeyFullMethods = []string{}
 
 func ValidateRequest(req interface{}) error {

@@ -26,6 +26,8 @@ type SpecApiClient interface {
 	UpsertPort(ctx context.Context, in *UpsertPortReq, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetAffinity(ctx context.Context, in *GetAffinityReq, opts ...grpc.CallOption) (*Affinity, error)
 	UpsertAffinity(ctx context.Context, in *UpsertAffinityReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	GetDeploymentConfig(ctx context.Context, in *GetDeploymentConfigReq, opts ...grpc.CallOption) (*DeploymentConfig, error)
+	UpsertDeploymentConfig(ctx context.Context, in *UpsertDeploymentConfigReq, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type specApiClient struct {
@@ -108,6 +110,24 @@ func (c *specApiClient) UpsertAffinity(ctx context.Context, in *UpsertAffinityRe
 	return out, nil
 }
 
+func (c *specApiClient) GetDeploymentConfig(ctx context.Context, in *GetDeploymentConfigReq, opts ...grpc.CallOption) (*DeploymentConfig, error) {
+	out := new(DeploymentConfig)
+	err := c.cc.Invoke(ctx, "/spec.SpecApi/GetDeploymentConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *specApiClient) UpsertDeploymentConfig(ctx context.Context, in *UpsertDeploymentConfigReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/spec.SpecApi/UpsertDeploymentConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SpecApiServer is the server API for SpecApi service.
 // All implementations must embed UnimplementedSpecApiServer
 // for forward compatibility
@@ -120,6 +140,8 @@ type SpecApiServer interface {
 	UpsertPort(context.Context, *UpsertPortReq) (*empty.Empty, error)
 	GetAffinity(context.Context, *GetAffinityReq) (*Affinity, error)
 	UpsertAffinity(context.Context, *UpsertAffinityReq) (*empty.Empty, error)
+	GetDeploymentConfig(context.Context, *GetDeploymentConfigReq) (*DeploymentConfig, error)
+	UpsertDeploymentConfig(context.Context, *UpsertDeploymentConfigReq) (*empty.Empty, error)
 	mustEmbedUnimplementedSpecApiServer()
 }
 
@@ -150,6 +172,12 @@ func (UnimplementedSpecApiServer) GetAffinity(context.Context, *GetAffinityReq) 
 }
 func (UnimplementedSpecApiServer) UpsertAffinity(context.Context, *UpsertAffinityReq) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertAffinity not implemented")
+}
+func (UnimplementedSpecApiServer) GetDeploymentConfig(context.Context, *GetDeploymentConfigReq) (*DeploymentConfig, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDeploymentConfig not implemented")
+}
+func (UnimplementedSpecApiServer) UpsertDeploymentConfig(context.Context, *UpsertDeploymentConfigReq) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertDeploymentConfig not implemented")
 }
 func (UnimplementedSpecApiServer) mustEmbedUnimplementedSpecApiServer() {}
 
@@ -308,6 +336,42 @@ func _SpecApi_UpsertAffinity_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SpecApi_GetDeploymentConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeploymentConfigReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SpecApiServer).GetDeploymentConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/spec.SpecApi/GetDeploymentConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SpecApiServer).GetDeploymentConfig(ctx, req.(*GetDeploymentConfigReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SpecApi_UpsertDeploymentConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertDeploymentConfigReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SpecApiServer).UpsertDeploymentConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/spec.SpecApi/UpsertDeploymentConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SpecApiServer).UpsertDeploymentConfig(ctx, req.(*UpsertDeploymentConfigReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _SpecApi_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "spec.SpecApi",
 	HandlerType: (*SpecApiServer)(nil),
@@ -343,6 +407,14 @@ var _SpecApi_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpsertAffinity",
 			Handler:    _SpecApi_UpsertAffinity_Handler,
+		},
+		{
+			MethodName: "GetDeploymentConfig",
+			Handler:    _SpecApi_GetDeploymentConfig_Handler,
+		},
+		{
+			MethodName: "UpsertDeploymentConfig",
+			Handler:    _SpecApi_UpsertDeploymentConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -13,6 +13,7 @@ import (
 	"github.com/herryg91/dply/dply-server/app/repository"
 	affinity_usecase "github.com/herryg91/dply/dply-server/app/usecase/affinity"
 	deploy_usecase "github.com/herryg91/dply/dply-server/app/usecase/deploy"
+	deployment_config_usecase "github.com/herryg91/dply/dply-server/app/usecase/deployment_config"
 	envar_usecase "github.com/herryg91/dply/dply-server/app/usecase/envar"
 	image_usecase "github.com/herryg91/dply/dply-server/app/usecase/image"
 	port_usecase "github.com/herryg91/dply/dply-server/app/usecase/port"
@@ -34,6 +35,7 @@ import (
 	"github.com/herryg91/dply/dply-server/pkg/password"
 	internalvalidationrule "github.com/herryg91/dply/dply-server/pkg/validationrule"
 	"github.com/herryg91/dply/dply-server/repository/affinity_repository"
+	"github.com/herryg91/dply/dply-server/repository/deployment_config_repository"
 	"github.com/herryg91/dply/dply-server/repository/deployment_repository"
 	"github.com/herryg91/dply/dply-server/repository/envar_repository"
 	"github.com/herryg91/dply/dply-server/repository/image_repository"
@@ -110,7 +112,10 @@ func main() {
 	affinity_repo := affinity_repository.New(db)
 	affinity_uc := affinity_usecase.New(affinity_repo)
 
-	spec_hndl := handler.NewSpecHandler(envar_uc, scale_uc, port_uc, affinity_uc)
+	deployment_config_repo := deployment_config_repository.New(db)
+	deployment_config_uc := deployment_config_usecase.New(deployment_config_repo)
+
+	spec_hndl := handler.NewSpecHandler(envar_uc, scale_uc, port_uc, affinity_uc, deployment_config_uc)
 
 	user_repo := user_repository.New(db)
 	user_uc := user_usecase.New(user_repo, password.NewBcryptPassword(cfg.PasswordSalt))
@@ -123,7 +128,7 @@ func main() {
 	image_hndl := handler.NewImageHandler(image_uc)
 
 	k8s_repo := k8s_repository.New(k8sClient)
-	deploy_uc := deploy_usecase.New(deploy_repo, k8s_repo, image_uc, envar_uc, scale_uc, port_uc, affinity_uc)
+	deploy_uc := deploy_usecase.New(deploy_repo, k8s_repo, image_uc, envar_uc, scale_uc, port_uc, affinity_uc, deployment_config_uc)
 	deploy_hndl := handler.NewDeployHandler(deploy_uc)
 
 	migration_repo := migration_repository.New(db)
@@ -234,6 +239,7 @@ func setupUpdateMigrations(db *gorm.DB, migration_repo repository.MigrationRepos
 
 	listToMigrate := []migration_file.MigrationFile{
 		migration_file.NewMigration0001(db),
+		migration_file.NewMigration0002(db),
 	}
 	isUpdate := false
 	for _, m := range listToMigrate {

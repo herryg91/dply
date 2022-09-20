@@ -299,3 +299,118 @@ func (r *repository) UpsertAffinity(data entity.Affinity) error {
 	}
 	return nil
 }
+
+func (r *repository) GetDeploymentConfig(project, env, name string) (*entity.DeploymentConfig, error) {
+	u := entity.User{}.FromFile()
+	if u == nil {
+		return nil, fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, "You are not login")
+	}
+
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
+
+	resp, err := r.cli.GetDeploymentConfig(ctx, &pbSpec.GetDeploymentConfigReq{Project: project, Env: env, Name: name})
+	if err != nil {
+		grsterr, errparse := grst_errors.NewFromError(err)
+		if errparse != nil {
+			return nil, err
+		}
+		if grsterr.HTTPStatus == http.StatusForbidden {
+			return nil, fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, grsterr.Message)
+		}
+		return nil, errors.New(grsterr.Message + ". " + fmt.Sprintf("%v", grsterr.OtherErrors))
+	}
+
+	out := &entity.DeploymentConfig{Project: project, Env: env, Name: name,
+		LivenessProbe:  nil,
+		ReadinessProbe: nil,
+		StartupProbe:   nil,
+	}
+
+	if resp.LivenessProbe != nil && resp.LivenessProbe.Path != "" && resp.LivenessProbe.Port > 0 {
+		out.LivenessProbe = &entity.HttpGetProbe{
+			Path:                resp.LivenessProbe.Path,
+			Port:                int(resp.LivenessProbe.Port),
+			FailureThreshold:    int(resp.LivenessProbe.FailureThreshold),
+			PeriodSeconds:       int(resp.LivenessProbe.PeriodSeconds),
+			InitialDelaySeconds: int(resp.LivenessProbe.InitialDelaySeconds),
+		}
+	}
+
+	if resp.ReadinessProbe != nil && resp.ReadinessProbe.Path != "" && resp.ReadinessProbe.Port > 0 {
+		out.ReadinessProbe = &entity.HttpGetProbe{
+			Path:                resp.ReadinessProbe.Path,
+			Port:                int(resp.ReadinessProbe.Port),
+			FailureThreshold:    int(resp.ReadinessProbe.FailureThreshold),
+			PeriodSeconds:       int(resp.ReadinessProbe.PeriodSeconds),
+			InitialDelaySeconds: int(resp.ReadinessProbe.InitialDelaySeconds),
+		}
+	}
+
+	if resp.StartupProbe != nil && resp.StartupProbe.Path != "" && resp.StartupProbe.Port > 0 {
+		out.StartupProbe = &entity.HttpGetProbe{
+			Path:                resp.StartupProbe.Path,
+			Port:                int(resp.StartupProbe.Port),
+			FailureThreshold:    int(resp.StartupProbe.FailureThreshold),
+			PeriodSeconds:       int(resp.StartupProbe.PeriodSeconds),
+			InitialDelaySeconds: int(resp.StartupProbe.InitialDelaySeconds),
+		}
+	}
+	return out, nil
+}
+
+func (r *repository) UpsertDeploymentConfig(data entity.DeploymentConfig) error {
+	u := entity.User{}.FromFile()
+	if u == nil {
+		return fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, "You are not login")
+	}
+
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"Authorization": u.Token}))
+
+	param := &pbSpec.UpsertDeploymentConfigReq{
+		Project:        data.Project,
+		Env:            data.Env,
+		Name:           data.Name,
+		LivenessProbe:  nil,
+		ReadinessProbe: nil,
+		StartupProbe:   nil,
+	}
+	if data.LivenessProbe != nil && data.LivenessProbe.Path != "" && data.LivenessProbe.Port > 0 {
+		param.LivenessProbe = &pbSpec.HttpGetProbe{
+			Path:                data.LivenessProbe.Path,
+			Port:                int32(data.LivenessProbe.Port),
+			FailureThreshold:    int32(data.LivenessProbe.FailureThreshold),
+			PeriodSeconds:       int32(data.LivenessProbe.PeriodSeconds),
+			InitialDelaySeconds: int32(data.LivenessProbe.InitialDelaySeconds),
+		}
+	}
+	if data.ReadinessProbe != nil && data.ReadinessProbe.Path != "" && data.ReadinessProbe.Port > 0 {
+		param.ReadinessProbe = &pbSpec.HttpGetProbe{
+			Path:                data.ReadinessProbe.Path,
+			Port:                int32(data.ReadinessProbe.Port),
+			FailureThreshold:    int32(data.ReadinessProbe.FailureThreshold),
+			PeriodSeconds:       int32(data.ReadinessProbe.PeriodSeconds),
+			InitialDelaySeconds: int32(data.ReadinessProbe.InitialDelaySeconds),
+		}
+	}
+	if data.StartupProbe != nil && data.StartupProbe.Path != "" && data.StartupProbe.Port > 0 {
+		param.StartupProbe = &pbSpec.HttpGetProbe{
+			Path:                data.StartupProbe.Path,
+			Port:                int32(data.StartupProbe.Port),
+			FailureThreshold:    int32(data.StartupProbe.FailureThreshold),
+			PeriodSeconds:       int32(data.StartupProbe.PeriodSeconds),
+			InitialDelaySeconds: int32(data.StartupProbe.InitialDelaySeconds),
+		}
+	}
+	_, err := r.cli.UpsertDeploymentConfig(ctx, param)
+	if err != nil {
+		grsterr, errparse := grst_errors.NewFromError(err)
+		if errparse != nil {
+			return err
+		}
+		if grsterr.HTTPStatus == http.StatusForbidden {
+			return fmt.Errorf("%w: %s", repository_intf.ErrUnauthorized, grsterr.Message)
+		}
+		return errors.New(grsterr.Message + ". " + fmt.Sprintf("%v", grsterr.OtherErrors))
+	}
+	return nil
+}
