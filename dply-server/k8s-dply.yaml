@@ -147,7 +147,7 @@ spec:
         command: ['sh', '-c', "until mysql -h dply-mysql.dply.svc.cluster.local -pmysql@dply -e \"SELECT 1\"; do echo waiting for mydb; sleep 2; done"]
       containers:
       - name: dply-server
-        image: herryg91/dply-server@sha256:627d226b253a45849609eca9e42b0ba5343f14b70b75bf49c03e260759cca369
+        image: herryg91/dply-server@sha256:a5fcf20cab4ade8bc603251c30d0890806ebe237bc5d822e25bb8b90f127f6c0
         imagePullPolicy: IfNotPresent
         env:
         - name: ENVIRONMENT

@@ -36,6 +36,14 @@ func newDeployImage(cfg *entity.Config, deploy_uc deploy_usecase.UseCase) *CmdDe
 }
 
 func (c *CmdDeployImage) runCommand(cmd *cobra.Command, args []string) error {
+	service_yaml_data, err := serviceYaml.GetServiceYAML("service.yaml")
+	if err != nil {
+		return err
+	}
+	if service_yaml_data.Project != "" {
+		c.project = service_yaml_data.Project
+	}
+
 	if c.deploy_uc == nil {
 		return errors.New("You haven't setup the configuration. command: `dply config edit` then set the `dply_server_host``")
 	} else if len(args) <= 0 {
@@ -51,7 +59,7 @@ func (c *CmdDeployImage) runCommand(cmd *cobra.Command, args []string) error {
 	}
 	digest := args[0]
 
-	err := c.deploy_uc.Deploy(c.project, c.env, c.name, digest)
+	err = c.deploy_uc.Deploy(c.project, c.env, c.name, digest)
 	if err != nil {
 		return err
 	}
