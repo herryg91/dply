@@ -36,6 +36,12 @@ func newSpecDeploymentConfigGet(cfg *entity.Config, deployment_config_uc deploym
 }
 
 func (c *CmdSpecDeploymentConfigGet) runCommand(cmd *cobra.Command, args []string) error {
+	service_yaml_data, err := serviceYaml.GetServiceYAML("service.yaml")
+	if err == nil {
+		if service_yaml_data.Project != "" {
+			c.project = service_yaml_data.Project
+		}
+	}
 	if c.deployment_config_uc == nil {
 		return errors.New("You haven't setup the configuration. command: `dply config edit` then set the `dply_server_host``")
 	} else if c.env == "" {

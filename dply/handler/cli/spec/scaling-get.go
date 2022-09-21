@@ -37,11 +37,10 @@ func newSpecScalingGet(cfg *entity.Config, scale_uc scale_usecase.UseCase) *CmdS
 
 func (c *CmdSpecScalingGet) runCommand(cmd *cobra.Command, args []string) error {
 	service_yaml_data, err := serviceYaml.GetServiceYAML("service.yaml")
-	if err != nil {
-		return err
-	}
-	if service_yaml_data.Project != "" {
-		c.project = service_yaml_data.Project
+	if err == nil {
+		if service_yaml_data.Project != "" {
+			c.project = service_yaml_data.Project
+		}
 	}
 
 	if c.scale_uc == nil {

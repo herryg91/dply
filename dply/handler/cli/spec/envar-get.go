@@ -37,11 +37,10 @@ func newSpecEnvarGet(cfg *entity.Config, envar_uc envar_usecase.UseCase) *CmdSpe
 
 func (c *CmdSpecEnvarGet) runCommand(cmd *cobra.Command, args []string) error {
 	service_yaml_data, err := serviceYaml.GetServiceYAML("service.yaml")
-	if err != nil {
-		return err
-	}
-	if service_yaml_data.Project != "" {
-		c.project = service_yaml_data.Project
+	if err == nil {
+		if service_yaml_data.Project != "" {
+			c.project = service_yaml_data.Project
+		}
 	}
 
 	if c.envar_uc == nil {
