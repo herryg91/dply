@@ -37,7 +37,7 @@ func (r *repository) GetLatestDeploymentGroupByName(project, name string) ([]*en
 	err := r.db.Raw(`
 		SELECT d1.*
 		FROM deployment d1
-		LEFT JOIN deployment d2 ON (d1.env = d2.env AND d1.name = d2.name AND d1.id < d2.id)
+		LEFT JOIN deployment d2 ON (d1.project = d2.project AND d1.env = d2.env AND d1.name = d2.name AND d1.id < d2.id)
 		WHERE d1.project = ?
 		AND d1.name = ?
 		AND d2.id IS NULL
