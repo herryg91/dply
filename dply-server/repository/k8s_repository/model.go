@@ -17,11 +17,16 @@ import (
 func NewDeploymentParam(param entity.Deployment) *v1.Deployment {
 	envars := []apiv1.EnvVar{}
 	for k, v := range param.Envar.Variables {
+		val := fmt.Sprintf("%v", v)
+		if vfloat, ok := v.(float64); ok {
+			val = strconv.FormatFloat(vfloat, 'f', -1, 64)
+		}
 		envars = append(envars, apiv1.EnvVar{
 			Name:  k,
-			Value: fmt.Sprintf("%v", v),
+			Value: val,
 		})
 	}
+
 	ports := []apiv1.ContainerPort{}
 	for _, p := range param.Port.Ports {
 		ports = append(ports, apiv1.ContainerPort{
