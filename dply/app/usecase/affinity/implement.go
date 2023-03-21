@@ -48,6 +48,7 @@ func (uc *usecase) UpsertViaEditor(project, env, name string, editorApp editor.E
 		"node_affinity":     getResp.NodeAffinity,
 		"pod_affinity":      getResp.PodAffinity,
 		"pod_anti_affinity": getResp.PodAntiAffinity,
+		"tolerations":       getResp.Tolerations,
 	}
 
 	currentData, _ := json.MarshalIndent(currentAffinity, "", "    ")

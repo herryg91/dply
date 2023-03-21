@@ -1,12 +1,13 @@
 package entity
 
 type Affinity struct {
-	Project         string         `json:"-"`
-	Env             string         `json:"-"`
-	Name            string         `json:"-"`
-	NodeAffinity    []AffinityTerm `json:"node_affinity"`
-	PodAffinity     []AffinityTerm `json:"pod_affinity"`
-	PodAntiAffinity []AffinityTerm `json:"pod_anti_affinity"`
+	Project         string               `json:"-"`
+	Env             string               `json:"-"`
+	Name            string               `json:"-"`
+	NodeAffinity    []AffinityTerm       `json:"node_affinity"`
+	PodAffinity     []AffinityTerm       `json:"pod_affinity"`
+	PodAntiAffinity []AffinityTerm       `json:"pod_anti_affinity"`
+	Tolerations     []AffinityToleration `json:"tolerations"`
 }
 
 type AffinityTerm struct {
@@ -16,6 +17,13 @@ type AffinityTerm struct {
 	Values      []string         `json:"values"`
 	Weight      int              `json:"weight"`
 	TopologyKey string           `json:"topology_key"`
+}
+
+type AffinityToleration struct {
+	Key      string `json:"key"`
+	Operator string `json:"operator"`
+	Value    string `json:"value"`
+	Effect   string `json:"effect"`
 }
 
 type AffinityOperator string

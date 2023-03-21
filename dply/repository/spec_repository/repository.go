@@ -241,6 +241,7 @@ func (r *repository) GetAffinity(project, env, name string) (*entity.Affinity, e
 	nodeAffinity := []entity.AffinityTerm{}
 	podAffinity := []entity.AffinityTerm{}
 	podAntiAffinity := []entity.AffinityTerm{}
+	tolerations := []entity.AffinityToleration{}
 
 	for _, a := range resp.NodeAffinity {
 		nodeAffinity = append(nodeAffinity, entity.AffinityTerm{Mode: entity.AffinityMode(a.Mode), Key: a.Key, Operator: entity.AffinityOperator(a.Operator), Values: a.Values, Weight: int(a.Weight), TopologyKey: a.TopologyKey})
@@ -251,8 +252,11 @@ func (r *repository) GetAffinity(project, env, name string) (*entity.Affinity, e
 	for _, a := range resp.PodAntiAffinity {
 		podAntiAffinity = append(podAntiAffinity, entity.AffinityTerm{Mode: entity.AffinityMode(a.Mode), Key: a.Key, Operator: entity.AffinityOperator(a.Operator), Values: a.Values, Weight: int(a.Weight), TopologyKey: a.TopologyKey})
 	}
+	for _, a := range resp.Tolerations {
+		tolerations = append(tolerations, entity.AffinityToleration{Key: a.Key, Operator: a.Operator, Value: a.Value, Effect: a.Effect})
+	}
 
-	affinity := &entity.Affinity{Project: project, Env: env, Name: name, NodeAffinity: nodeAffinity, PodAffinity: podAffinity, PodAntiAffinity: podAntiAffinity}
+	affinity := &entity.Affinity{Project: project, Env: env, Name: name, NodeAffinity: nodeAffinity, PodAffinity: podAffinity, PodAntiAffinity: podAntiAffinity, Tolerations: tolerations}
 
 	return affinity, nil
 }
@@ -267,6 +271,7 @@ func (r *repository) UpsertAffinity(data entity.Affinity) error {
 	nodeAffinity := []*pbSpec.AffinityTerm{}
 	podAffinity := []*pbSpec.AffinityTerm{}
 	podAntiAffinity := []*pbSpec.AffinityTerm{}
+	tolerations := []*pbSpec.AffinityToleration{}
 
 	for _, a := range data.NodeAffinity {
 		nodeAffinity = append(nodeAffinity, &pbSpec.AffinityTerm{Mode: string(a.Mode), Key: a.Key, Operator: string(a.Operator), Values: a.Values, Weight: int32(a.Weight), TopologyKey: a.TopologyKey})
@@ -278,6 +283,9 @@ func (r *repository) UpsertAffinity(data entity.Affinity) error {
 	for _, a := range data.PodAntiAffinity {
 		podAntiAffinity = append(podAntiAffinity, &pbSpec.AffinityTerm{Mode: string(a.Mode), Key: a.Key, Operator: string(a.Operator), Values: a.Values, Weight: int32(a.Weight), TopologyKey: a.TopologyKey})
 	}
+	for _, a := range data.Tolerations {
+		tolerations = append(tolerations, &pbSpec.AffinityToleration{Key: a.Key, Operator: a.Operator, Value: a.Value, Effect: a.Effect})
+	}
 
 	_, err := r.cli.UpsertAffinity(ctx, &pbSpec.UpsertAffinityReq{
 		Project:         data.Project,
@@ -286,6 +294,7 @@ func (r *repository) UpsertAffinity(data entity.Affinity) error {
 		NodeAffinity:    nodeAffinity,
 		PodAffinity:     podAffinity,
 		PodAntiAffinity: podAntiAffinity,
+		Tolerations:     tolerations,
 	})
 	if err != nil {
 		grsterr, errparse := grst_errors.NewFromError(err)
