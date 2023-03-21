@@ -3,6 +3,7 @@ package k8s_repository
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/herryg91/dply/dply-server/entity"
 	v1 "k8s.io/api/apps/v1"
@@ -109,6 +110,7 @@ func NewDeploymentParam(param entity.Deployment) *v1.Deployment {
 						PodAffinity:     &corev1.PodAffinity{},
 						PodAntiAffinity: &corev1.PodAntiAffinity{},
 					},
+					Tolerations: []corev1.Toleration{},
 					Containers: []apiv1.Container{
 						{
 							Name:            param.Name,
@@ -270,6 +272,44 @@ func NewDeploymentParam(param entity.Deployment) *v1.Deployment {
 		deployment.Spec.Template.Spec.Affinity.PodAntiAffinity = nil
 	}
 
+	if len(param.Affinity.Tolerations) > 0 {
+		tolerations := []corev1.Toleration{}
+		for _, toleration := range param.Affinity.Tolerations {
+			effect := apiv1.TaintEffectPreferNoSchedule
+			switch strings.ToLower(toleration.Effect) {
+			case "noschedule":
+				effect = apiv1.TaintEffectNoSchedule
+			case "noexecute":
+				effect = apiv1.TaintEffectNoExecute
+			case "prefernoschedule":
+				effect = apiv1.TaintEffectPreferNoSchedule
+			default:
+				effect = apiv1.TaintEffectNoSchedule
+			}
+
+			operator := apiv1.TolerationOpEqual
+			switch strings.ToLower(toleration.Effect) {
+			case "equal":
+				operator = apiv1.TolerationOpEqual
+			case "exists":
+				operator = apiv1.TolerationOpExists
+			default:
+				operator = apiv1.TolerationOpEqual
+			}
+
+			tolerations = append(tolerations, corev1.Toleration{
+				Key:      toleration.Key,
+				Operator: operator,
+				Value:    toleration.Value,
+				Effect:   effect,
+			})
+		}
+		if len(tolerations) > 0 {
+			deployment.Spec.Template.Spec.Tolerations = tolerations
+		}
+	} else {
+		deployment.Spec.Template.Spec.Tolerations = nil
+	}
 	return deployment
 }
 

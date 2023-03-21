@@ -209,12 +209,14 @@ message UpsertAffinityReq {
     repeated AffinityTerm NodeAffinity = 3 [json_name="node_affinity"];
 	repeated AffinityTerm PodAffinity = 4 [json_name="pod_affinity"];
 	repeated AffinityTerm PodAntiAffinity = 5 [json_name="pod_anti_affinity"];
+    repeated AffinityToleration Tolerations = 7 [json_name="tolerations"];
 }
 
 message Affinity {
     repeated AffinityTerm NodeAffinity = 3 [json_name="node_affinity", (cdd.api.validate) = "required"];
 	repeated AffinityTerm PodAffinity = 4 [json_name="pod_affinity", (cdd.api.validate) = "required"];
 	repeated AffinityTerm PodAntiAffinity = 5 [json_name="pod_anti_affinity", (cdd.api.validate) = "required"];
+    repeated AffinityToleration Tolerations = 6 [json_name="tolerations"];
 }
 
 message AffinityTerm {
@@ -226,6 +228,12 @@ message AffinityTerm {
     string TopologyKey = 6 [json_name="topology_key"];
 }
 
+message AffinityToleration {
+    string Key = 1 [json_name="key", (cdd.api.validate) = "required"];
+    string Operator = 2 [json_name="operator", (cdd.api.validate) = "enum=Equal,Exists"];
+    string Value = 3 [json_name="value"];
+    string Effect = 4 [json_name="effect", (cdd.api.validate) = "enum=NoSchedule,NoExecute,PreferNoSchedule"];
+}
 
 message GetAffinityTemplateReq {
     string TemplateName = 1 [json_name="template_name", (cdd.api.validate) = "required"];
@@ -236,6 +244,7 @@ message UpdateAffinityTemplateReq {
     repeated AffinityTerm NodeAffinity = 2 [json_name="node_affinity"];
 	repeated AffinityTerm PodAffinity = 3 [json_name="pod_affinity"];
 	repeated AffinityTerm PodAntiAffinity = 4 [json_name="pod_anti_affinity"];
+    repeated AffinityToleration Tolerations = 5 [json_name="tolerations"];
 }
 
 // Deployment Config Section

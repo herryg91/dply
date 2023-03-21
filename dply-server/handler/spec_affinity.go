@@ -24,6 +24,7 @@ func (h *specConfig) GetAffinity(ctx context.Context, req *pbSpec.GetAffinityReq
 	nodeAffinity := []*pbSpec.AffinityTerm{}
 	podAffinity := []*pbSpec.AffinityTerm{}
 	podAntiAffinity := []*pbSpec.AffinityTerm{}
+	tolerations := []*pbSpec.AffinityToleration{}
 
 	for _, a := range resp.NodeAffinity {
 		nodeAffinity = append(nodeAffinity, &pbSpec.AffinityTerm{Mode: string(a.Mode), Key: a.Key, Operator: string(a.Operator), Values: a.Values, Weight: int32(a.Weight), TopologyKey: a.TopologyKey})
@@ -34,11 +35,15 @@ func (h *specConfig) GetAffinity(ctx context.Context, req *pbSpec.GetAffinityReq
 	for _, a := range resp.PodAntiAffinity {
 		podAntiAffinity = append(podAntiAffinity, &pbSpec.AffinityTerm{Mode: string(a.Mode), Key: a.Key, Operator: string(a.Operator), Values: a.Values, Weight: int32(a.Weight), TopologyKey: a.TopologyKey})
 	}
+	for _, a := range resp.Tolerations {
+		tolerations = append(tolerations, &pbSpec.AffinityToleration{Key: a.Key, Operator: a.Operator, Value: a.Value, Effect: a.Effect})
+	}
 
 	return &pbSpec.Affinity{
 		NodeAffinity:    nodeAffinity,
 		PodAffinity:     podAffinity,
 		PodAntiAffinity: podAntiAffinity,
+		Tolerations:     tolerations,
 	}, nil
 }
 
@@ -51,6 +56,7 @@ func (h *specConfig) UpsertAffinity(ctx context.Context, req *pbSpec.UpsertAffin
 	nodeAffinity := []entity.AffinityTerm{}
 	podAffinity := []entity.AffinityTerm{}
 	podAntiAffinity := []entity.AffinityTerm{}
+	tolerations := []entity.AffinityToleration{}
 
 	for _, a := range req.NodeAffinity {
 		nodeAffinity = append(nodeAffinity, entity.AffinityTerm{Mode: entity.AffinityMode(a.Mode), Key: a.Key, Operator: entity.AffinityOperator(a.Operator), Values: a.Values, Weight: int(a.Weight), TopologyKey: a.TopologyKey})
@@ -61,6 +67,9 @@ func (h *specConfig) UpsertAffinity(ctx context.Context, req *pbSpec.UpsertAffin
 	for _, a := range req.PodAntiAffinity {
 		podAntiAffinity = append(podAntiAffinity, entity.AffinityTerm{Mode: entity.AffinityMode(a.Mode), Key: a.Key, Operator: entity.AffinityOperator(a.Operator), Values: a.Values, Weight: int(a.Weight), TopologyKey: a.TopologyKey})
 	}
+	for _, a := range req.Tolerations {
+		tolerations = append(tolerations, entity.AffinityToleration{Key: a.Key, Operator: a.Operator, Value: a.Value, Effect: a.Effect})
+	}
 
 	err := h.affinity_uc.Upsert(entity.Affinity{
 		Project:         req.Project,
@@ -69,6 +78,7 @@ func (h *specConfig) UpsertAffinity(ctx context.Context, req *pbSpec.UpsertAffin
 		NodeAffinity:    nodeAffinity,
 		PodAffinity:     podAffinity,
 		PodAntiAffinity: podAntiAffinity,
+		Tolerations:     tolerations,
 		CreatedBy:       userCtx.Id,
 	})
 	if err != nil {
@@ -90,6 +100,7 @@ func (h *specConfig) GetAffinityTemplate(ctx context.Context, req *pbSpec.GetAff
 	nodeAffinity := []*pbSpec.AffinityTerm{}
 	podAffinity := []*pbSpec.AffinityTerm{}
 	podAntiAffinity := []*pbSpec.AffinityTerm{}
+	tolerations := []*pbSpec.AffinityToleration{}
 
 	for _, a := range resp.NodeAffinity {
 		nodeAffinity = append(nodeAffinity, &pbSpec.AffinityTerm{Mode: string(a.Mode), Key: a.Key, Operator: string(a.Operator), Values: a.Values, Weight: int32(a.Weight), TopologyKey: a.TopologyKey})
@@ -100,11 +111,15 @@ func (h *specConfig) GetAffinityTemplate(ctx context.Context, req *pbSpec.GetAff
 	for _, a := range resp.PodAntiAffinity {
 		podAntiAffinity = append(podAntiAffinity, &pbSpec.AffinityTerm{Mode: string(a.Mode), Key: a.Key, Operator: string(a.Operator), Values: a.Values, Weight: int32(a.Weight), TopologyKey: a.TopologyKey})
 	}
+	for _, a := range resp.Tolerations {
+		tolerations = append(tolerations, &pbSpec.AffinityToleration{Key: a.Key, Operator: a.Operator, Value: a.Value, Effect: a.Effect})
+	}
 
 	return &pbSpec.Affinity{
 		NodeAffinity:    nodeAffinity,
 		PodAffinity:     podAffinity,
 		PodAntiAffinity: podAntiAffinity,
+		Tolerations:     tolerations,
 	}, nil
 }
 
@@ -116,6 +131,7 @@ func (h *specConfig) UpdateAffinityTemplate(ctx context.Context, req *pbSpec.Upd
 	nodeAffinity := []entity.AffinityTerm{}
 	podAffinity := []entity.AffinityTerm{}
 	podAntiAffinity := []entity.AffinityTerm{}
+	tolerations := []entity.AffinityToleration{}
 
 	for _, a := range req.NodeAffinity {
 		nodeAffinity = append(nodeAffinity, entity.AffinityTerm{Mode: entity.AffinityMode(a.Mode), Key: a.Key, Operator: entity.AffinityOperator(a.Operator), Values: a.Values, Weight: int(a.Weight), TopologyKey: a.TopologyKey})
@@ -126,12 +142,16 @@ func (h *specConfig) UpdateAffinityTemplate(ctx context.Context, req *pbSpec.Upd
 	for _, a := range req.PodAntiAffinity {
 		podAntiAffinity = append(podAntiAffinity, entity.AffinityTerm{Mode: entity.AffinityMode(a.Mode), Key: a.Key, Operator: entity.AffinityOperator(a.Operator), Values: a.Values, Weight: int(a.Weight), TopologyKey: a.TopologyKey})
 	}
+	for _, a := range req.Tolerations {
+		tolerations = append(tolerations, entity.AffinityToleration{Key: a.Key, Operator: a.Operator, Value: a.Value, Effect: a.Effect})
+	}
 
 	err := h.affinity_uc.UpsertTemplate(entity.AffinityTemplate{
 		TemplateName:    req.TemplateName,
 		NodeAffinity:    nodeAffinity,
 		PodAffinity:     podAffinity,
 		PodAntiAffinity: podAntiAffinity,
+		Tolerations:     tolerations,
 	})
 	if err != nil {
 		return nil, grst_errors.New(http.StatusInternalServerError, codes.Internal, 14401, err.Error())

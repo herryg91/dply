@@ -19,13 +19,14 @@ const (
 )
 
 type Affinity struct {
-	Project         string         `json:"project"`
-	Env             string         `json:"env"`
-	Name            string         `json:"name"`
-	NodeAffinity    []AffinityTerm `json:"node_affinity"`
-	PodAffinity     []AffinityTerm `json:"pod_affinity"`
-	PodAntiAffinity []AffinityTerm `json:"pod_anti_affinity"`
-	CreatedBy       int            `json:"created_by"`
+	Project         string               `json:"project"`
+	Env             string               `json:"env"`
+	Name            string               `json:"name"`
+	NodeAffinity    []AffinityTerm       `json:"node_affinity"`
+	PodAffinity     []AffinityTerm       `json:"pod_affinity"`
+	PodAntiAffinity []AffinityTerm       `json:"pod_anti_affinity"`
+	Tolerations     []AffinityToleration `json:"tolerations"`
+	CreatedBy       int                  `json:"created_by"`
 }
 
 type AffinityTerm struct {
@@ -37,6 +38,13 @@ type AffinityTerm struct {
 	TopologyKey string           `json:"topology_key"`
 }
 
+type AffinityToleration struct {
+	Key      string `json:"key"`
+	Operator string `json:"operator"`
+	Value    string `json:"value"`
+	Effect   string `json:"effect"`
+}
+
 func (Affinity) DefaultAffinity(env, name string) *Affinity {
 	return &Affinity{
 		Env:             env,
@@ -44,14 +52,16 @@ func (Affinity) DefaultAffinity(env, name string) *Affinity {
 		NodeAffinity:    []AffinityTerm{},
 		PodAffinity:     []AffinityTerm{},
 		PodAntiAffinity: []AffinityTerm{},
+		Tolerations:     []AffinityToleration{},
 	}
 }
 
 type AffinityTemplate struct {
-	TemplateName    string         `json:"template_name"`
-	NodeAffinity    []AffinityTerm `json:"node_affinity"`
-	PodAffinity     []AffinityTerm `json:"pod_affinity"`
-	PodAntiAffinity []AffinityTerm `json:"pod_anti_affinity"`
+	TemplateName    string               `json:"template_name"`
+	NodeAffinity    []AffinityTerm       `json:"node_affinity"`
+	PodAffinity     []AffinityTerm       `json:"pod_affinity"`
+	PodAntiAffinity []AffinityTerm       `json:"pod_anti_affinity"`
+	Tolerations     []AffinityToleration `json:"tolerations"`
 }
 
 func (AffinityTemplate) DefaultAffinityTemplate() *AffinityTemplate {
@@ -60,6 +70,7 @@ func (AffinityTemplate) DefaultAffinityTemplate() *AffinityTemplate {
 		NodeAffinity:    []AffinityTerm{},
 		PodAffinity:     []AffinityTerm{},
 		PodAntiAffinity: []AffinityTerm{},
+		Tolerations:     []AffinityToleration{},
 	}
 }
 func (at *AffinityTemplate) ToAffinityEntity(env, name string) *Affinity {
@@ -69,5 +80,6 @@ func (at *AffinityTemplate) ToAffinityEntity(env, name string) *Affinity {
 		NodeAffinity:    at.NodeAffinity,
 		PodAffinity:     at.PodAffinity,
 		PodAntiAffinity: at.PodAntiAffinity,
+		Tolerations:     at.Tolerations,
 	}
 }

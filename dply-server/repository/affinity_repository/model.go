@@ -38,6 +38,7 @@ func (AffinityModel) FromAffinityEntity(a entity.Affinity) *AffinityModel {
 		"node_affinity":     a.NodeAffinity,
 		"pod_affinity":      a.PodAffinity,
 		"pod_anti_affinity": a.PodAntiAffinity,
+		"tolerations":       a.Tolerations,
 	}
 	affinityJson, _ := json.Marshal(&affinity)
 
@@ -68,6 +69,7 @@ func (am *AffinityTemplateModel) ToAffinityTemplateEntity() *entity.AffinityTemp
 		NodeAffinity:    []entity.AffinityTerm{},
 		PodAffinity:     []entity.AffinityTerm{},
 		PodAntiAffinity: []entity.AffinityTerm{},
+		Tolerations:     []entity.AffinityToleration{},
 	}
 
 	json.Unmarshal(am.Affinity, &resp)
@@ -79,6 +81,7 @@ func (AffinityTemplateModel) FromAffinityTemplateEntity(a entity.AffinityTemplat
 		"node_affinity":     a.NodeAffinity,
 		"pod_affinity":      a.PodAffinity,
 		"pod_anti_affinity": a.PodAntiAffinity,
+		"tolerations":       a.Tolerations,
 	}
 	affinityJson, _ := json.Marshal(&affinity)
 	return &AffinityTemplateModel{
