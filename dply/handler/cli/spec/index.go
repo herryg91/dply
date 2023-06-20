@@ -57,6 +57,7 @@ func New() *CmdSpec {
 	c.AddCommand(newSpecScalingEdit(cfg, scale_uc).Command)
 	c.AddCommand(newSpecEnvarGet(cfg, envar_uc).Command)
 	c.AddCommand(newSpecEnvarEdit(cfg, envar_uc).Command)
+	c.AddCommand(newSpecEnvarSet(cfg, envar_uc).Command)
 	c.AddCommand(newSpecPortGet(cfg, port_uc).Command)
 	c.AddCommand(newSpecPortEdit(cfg, port_uc).Command)
 	c.AddCommand(newSpecAffinityGet(cfg, affinity_uc).Command)
